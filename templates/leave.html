@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Leave Management</h2>
+    <div class="header-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('leaveModal').style.display='block'">Request Leave</button>
+    </div>
+</div>
+
+<div class="kpi-container">
+    <div class="kpi-card">
+        <div class="kpi-title">Pending Requests</div>
+        <div class="kpi-value">12</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Approved This Month</div>
+        <div class="kpi-value text-success">45</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Employees on Leave</div>
+        <div class="kpi-value">7</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Leave Requests</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Leave Type</th>
+                    <th>From Date</th>
+                    <th>To Date</th>
+                    <th>Duration (Days)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>Annual Leave</td>
+                    <td>2023-11-20</td>
+                    <td>2023-11-24</td>
+                    <td>5</td>
+                    <td><span class="badge badge-warning">Pending</span></td>
+                    <td>
+                        <button class="btn btn-success btn-sm">Approve</button>
+                        <button class="btn btn-danger btn-sm">Reject</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>Sick Leave</td>
+                    <td>2023-11-15</td>
+                    <td>2023-11-16</td>
+                    <td>2</td>
+                    <td><span class="badge badge-success">Approved</span></td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" disabled>Processed</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mike Johnson</td>
+                    <td>Unpaid Leave</td>
+                    <td>2023-12-01</td>
+                    <td>2023-12-10</td>
+                    <td>10</td>
+                    <td><span class="badge badge-danger">Rejected</span></td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" disabled>Processed</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="leaveModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div class="modal-content" style="background:#fff; width:400px; margin:10% auto; padding:20px; border-radius:8px;">
+        <h3>Request Leave</h3>
+        <form>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>Leave Type</label>
+                <select class="form-control" style="width:100%; padding:8px; margin-top:5px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option>Annual Leave</option>
+                    <option>Sick Leave</option>
+                    <option>Unpaid Leave</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>From Date</label>
+                <input type="date" class="form-control" style="width:100%; padding:8px; margin-top:5px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>To Date</label>
+                <input type="date" class="form-control" style="width:100%; padding:8px; margin-top:5px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>Reason</label>
+                <textarea class="form-control" style="width:100%; padding:8px; margin-top:5px; height:80px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+            </div>
+            <div class="form-actions" style="text-align:right;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('leaveModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Attendance Management</h2>
+    <div class="header-actions">
+        <button class="btn btn-primary">Export Report</button>
+    </div>
+</div>
+
+<div class="kpi-container">
+    <div class="kpi-card">
+        <div class="kpi-title">Present Today</div>
+        <div class="kpi-value text-success">142</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Late Today</div>
+        <div class="kpi-value text-warning">8</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Absent Today</div>
+        <div class="kpi-value text-danger">4</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Today's Attendance</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                    <th>Overtime</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>EMP001</td>
+                    <td>John Doe</td>
+                    <td>Engineering</td>
+                    <td>08:50 AM</td>
+                    <td>-</td>
+                    <td><span class="badge badge-success">Present</span></td>
+                    <td>0h</td>
+                </tr>
+                <tr>
+                    <td>EMP002</td>
+                    <td>Jane Smith</td>
+                    <td>Marketing</td>
+                    <td>09:15 AM</td>
+                    <td>-</td>
+                    <td><span class="badge badge-warning">Late</span></td>
+                    <td>0h</td>
+                </tr>
+                <tr>
+                    <td>EMP003</td>
+                    <td>Mike Johnson</td>
+                    <td>Sales</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td><span class="badge badge-danger">Absent</span></td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>EMP004</td>
+                    <td>Emily Davis</td>
+                    <td>HR</td>
+                    <td>08:55 AM</td>
+                    <td>07:30 PM</td>
+                    <td><span class="badge badge-success">Present</span></td>
+                    <td>2.5h</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

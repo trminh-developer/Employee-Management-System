@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Employee Profile - Employee Management{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="profile-avatar-large">JD</div>
+    <div class="profile-title">
+        <h1>John Doe</h1>
+        <p class="job-title">Senior Developer</p>
+        <p class="department">Engineering</p>
+    </div>
+</div>
+
+<div class="profile-tabs">
+    <nav class="tabs-nav">
+        <a href="#personal" class="tab-link active">Personal</a>
+        <a href="#employment" class="tab-link">Employment</a>
+        <a href="#attendance" class="tab-link">Attendance</a>
+        <a href="#performance" class="tab-link">Performance</a>
+    </nav>
+</div>
+
+<div class="profile-content">
+    <div id="personal" class="tab-pane active">
+        <div class="grid-layout">
+            <div class="info-group">
+                <label>Email</label>
+                <p>john.doe@example.com</p>
+            </div>
+            <div class="info-group">
+                <label>Phone</label>
+                <p>+1 234 567 8900</p>
+            </div>
+            <div class="info-group">
+                <label>Date of Birth</label>
+                <p>January 15, 1990</p>
+            </div>
+            <div class="info-group">
+                <label>Address</label>
+                <p>123 Main St, City, Country</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="employment" class="tab-pane" style="display: none;">
+        <div class="grid-layout">
+            <div class="info-group">
+                <label>Hire Date</label>
+                <p>March 1, 2020</p>
+            </div>
+            <div class="info-group">
+                <label>Manager</label>
+                <p>Sarah Connor</p>
+            </div>
+            <div class="info-group">
+                <label>Employment Type</label>
+                <p>Full-Time</p>
+            </div>
+            <div class="info-group">
+                <label>Work Location</label>
+                <p>New York Office</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="attendance" class="tab-pane" style="display: none;">
+        <h3>Leave Balance</h3>
+        <div class="grid-layout">
+            <div class="info-group">
+                <label>Annual Leave</label>
+                <p>12 Days Available</p>
+            </div>
+            <div class="info-group">
+                <label>Sick Leave</label>
+                <p>5 Days Available</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="performance" class="tab-pane" style="display: none;">
+        <h3>Latest Reviews</h3>
+        <div class="grid-layout">
+            <div class="info-group">
+                <label>2023 Annual Review</label>
+                <p>Rating: Exceeds Expectations</p>
+            </div>
+            <div class="info-group">
+                <label>Q1 2024 Check-in</label>
+                <p>On track with goals</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links and panes
+                tabLinks.forEach(l => l.classList.remove('active'));
+                tabPanes.forEach(p => {
+                    p.classList.remove('active');
+                    p.style.display = 'none';
+                });
+
+                // Add active class to clicked link
+                this.classList.add('active');
+
+                // Show corresponding pane
+                const targetId = this.getAttribute('href').substring(1);
+                const targetPane = document.getElementById(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                    targetPane.style.display = 'block';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

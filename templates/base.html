@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i data-lucide="building-2"></i> EMS Portal
+                </div>
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle Sidebar">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+            
+            <div class="user-profile-mini" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.75rem;">
+                <div class="avatar" style="background: var(--primary-100); color: var(--primary-700); font-weight: 600;">{{ request.user.username|slice:":2"|upper|default:"AD" }}</div>
+                <div class="user-info" style="display: flex; flex-direction: column;">
+                    <span class="user-name" style="font-weight: 600; font-size: 0.875rem;">{{ request.user.get_full_name|default:request.user.username }}</span>
+                    <span class="user-role" style="font-size: 0.75rem; color: var(--text-secondary); text-transform: capitalize;">{{ request.user.role|default:"Administrator" }}</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{% url 'employees:list' %}" class="nav-item {% if request.resolver_match.app_name == 'employees' %}active{% endif %}">
+                    <i data-lucide="users" class="nav-icon"></i>
+                    <span class="nav-text">Employees</span>
+                </a>
+                <a href="{% url 'departments:list' %}" class="nav-item {% if request.resolver_match.app_name == 'departments' %}active{% endif %}">
+                    <i data-lucide="network" class="nav-icon"></i>
+                    <span class="nav-text">Departments</span>
+                </a>
+                <a href="{% url 'attendance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'attendance' %}active{% endif %}">
+                    <i data-lucide="clock" class="nav-icon"></i>
+                    <span class="nav-text">Attendance</span>
+                </a>
+                <a href="{% url 'leave:list' %}" class="nav-item {% if request.resolver_match.app_name == 'leave' %}active{% endif %}">
+                    <i data-lucide="calendar-off" class="nav-icon"></i>
+                    <span class="nav-text">Leave</span>
+                </a>
+                <a href="{% url 'payroll:list' %}" class="nav-item {% if request.resolver_match.app_name == 'payroll' %}active{% endif %}">
+                    <i data-lucide="banknote" class="nav-icon"></i>
+                    <span class="nav-text">Payroll</span>
+                </a>
+                <a href="{% url 'performance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                    <i data-lucide="trending-up" class="nav-icon"></i>
+                    <span class="nav-text">Performance</span>
+                </a>
+                <a href="{% url 'reports:list' %}" class="nav-item {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+                    <i data-lucide="pie-chart" class="nav-icon"></i>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <a href="{% url 'notifications:list' %}" class="nav-item {% if request.resolver_match.app_name == 'notifications' %}active{% endif %}">
+                    <i data-lucide="bell" class="nav-icon"></i>
+                    <span class="nav-text">Notifications</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <main class="main-wrapper">
+            <header class="topbar">
+                <div class="search-container">
+                    <button class="search-trigger" onclick="document.getElementById('command-palette').classList.add('open')">
+                        <i data-lucide="search"></i>
+                        <span>Search employees, departments...</span>
+                        <span class="search-shortcut">Ctrl+K</span>
+                    </button>
+                </div>
+                
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" style="padding: 0.5rem 1rem;">
+                        <i data-lucide="plus"></i> Add
+                    </button>
+                    <button id="theme-toggle" class="action-btn" aria-label="Toggle Dark Mode">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i data-lucide="bell"></i>
+                    </button>
+                    <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="avatar avatar-sm">{{ request.user.username|slice:":2"|upper|default:"AD" }}</div>
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn" aria-label="Logout" title="Logout">
+                                <i data-lucide="log-out"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content" style="padding: 2rem;">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

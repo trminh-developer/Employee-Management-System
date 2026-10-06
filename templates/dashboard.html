@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Employee Management{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Add canvas background styles to dashboard header */
+    .dashboard-header-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--bg-surface) 0%, var(--primary-50) 100%);
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        padding: 0 2rem;
+    }
+    #network-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: auto; /* Allow mouse interaction */
+    }
+    .page-header {
+        position: relative;
+        z-index: 1;
+        border: none;
+        margin: 0;
+        background: transparent;
+        width: 100%;
+    }
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+    [data-theme='dark'] .dashboard-header-wrapper {
+        background: linear-gradient(135deg, var(--bg-surface) 0%, var(--sidebar-bg) 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header-wrapper">
+    <canvas id="network-canvas"></canvas>
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Intelligent Insights & Overview</p>
+    </div>
+</div>
+
+<div class="kpi-grid">
+    <!-- Card 1 -->
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <h3>Total Employees</h3>
+            <span class="kpi-icon">👥</span>
+        </div>
+        <div class="kpi-value">1,245</div>
+        <div class="kpi-trend positive">
+            <span class="trend-icon">↑</span> 12% from last month
+        </div>
+    </div>
+    <!-- Card 2 -->
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <h3>Active</h3>
+            <span class="kpi-icon">🟢</span>
+        </div>
+        <div class="kpi-value">1,180</div>
+        <div class="kpi-trend positive">
+            <span class="trend-icon">↑</span> 5% from last month
+        </div>
+    </div>
+    <!-- Card 3 -->
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <h3>On Leave</h3>
+            <span class="kpi-icon">⛱️</span>
+        </div>
+        <div class="kpi-value">45</div>
+        <div class="kpi-trend negative">
+            <span class="trend-icon">↓</span> 2% from last month
+        </div>
+    </div>
+    <!-- Card 4 -->
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <h3>New Hires</h3>
+            <span class="kpi-icon">🎉</span>
+        </div>
+        <div class="kpi-value">20</div>
+        <div class="kpi-trend positive">
+            <span class="trend-icon">↑</span> 8% from last month
+        </div>
+    </div>
+</div>
+
+<div class="charts-section">
+    <div class="chart-container">
+        <h3>Employee Growth</h3>
+        <canvas id="growthChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Department Distribution</h3>
+        <canvas id="deptChart"></canvas>
+    </div>
+</div>
+
+<div class="recent-activity">
+    <h3>Recent Activity</h3>
+    <ul class="activity-timeline">
+        <li class="activity-item">
+            <div class="activity-time">10:00 AM</div>
+            <div class="activity-content"><strong>John Doe</strong> joined the Engineering department.</div>
+        </li>
+        <li class="activity-item">
+            <div class="activity-time">09:15 AM</div>
+            <div class="activity-content"><strong>Jane Smith</strong> requested annual leave.</div>
+        </li>
+        <li class="activity-item">
+            <div class="activity-time">Yesterday</div>
+            <div class="activity-content"><strong>Michael Brown</strong> updated his profile picture.</div>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Employee Growth Chart
+        const growthCtx = document.getElementById('growthChart').getContext('2d');
+        if (growthCtx) {
+            new Chart(growthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Employees',
+                        data: [1150, 1170, 1190, 1210, 1235, 1245],
+                        borderColor: '#2563eb',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Department Distribution Chart
+        const deptCtx = document.getElementById('deptChart').getContext('2d');
+        if (deptCtx) {
+            new Chart(deptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance'],
+                    datasets: [{
+                        data: [450, 300, 200, 150, 145],
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    });
+</script>
+<script src="{% static 'js/canvas-animation.js' %}"></script>
+{% endblock %}

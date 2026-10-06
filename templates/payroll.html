@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Payroll Processing</h2>
+    <div class="header-actions">
+        <button class="btn btn-secondary">Run Payroll</button>
+        <button class="btn btn-primary">Export</button>
+    </div>
+</div>
+
+<div class="kpi-container">
+    <div class="kpi-card">
+        <div class="kpi-title">Total Payroll (Nov)</div>
+        <div class="kpi-value">$245,000</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Gross Salary</div>
+        <div class="kpi-value">$210,000</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Total Taxes</div>
+        <div class="kpi-value">$35,000</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Employee Salary Details</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Base Salary</th>
+                    <th>Allowances</th>
+                    <th>Gross Pay</th>
+                    <th>Deductions / Taxes</th>
+                    <th>Net Pay</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>$5,000</td>
+                    <td>$500</td>
+                    <td>$5,500</td>
+                    <td>$800</td>
+                    <td><strong>$4,700</strong></td>
+                    <td><span class="badge badge-success">Paid</span></td>
+                    <td><button class="btn btn-sm btn-secondary">Payslip</button></td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>$6,200</td>
+                    <td>$600</td>
+                    <td>$6,800</td>
+                    <td>$1,100</td>
+                    <td><strong>$5,700</strong></td>
+                    <td><span class="badge badge-success">Paid</span></td>
+                    <td><button class="btn btn-sm btn-secondary">Payslip</button></td>
+                </tr>
+                <tr>
+                    <td>Mike Johnson</td>
+                    <td>$4,500</td>
+                    <td>$300</td>
+                    <td>$4,800</td>
+                    <td>$700</td>
+                    <td><strong>$4,100</strong></td>
+                    <td><span class="badge badge-warning">Processing</span></td>
+                    <td><button class="btn btn-sm btn-secondary">Payslip</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

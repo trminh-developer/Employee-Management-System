@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Employees - Employee Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Employees</h1>
+</div>
+
+<div class="employee-workspace">
+    <div class="toolbar">
+        <div class="search-box">
+            <input type="text" placeholder="Search employees..." class="form-input">
+        </div>
+        <div class="filters">
+            <select class="form-select">
+                <option value="">All Departments</option>
+                <option value="engineering">Engineering</option>
+                <option value="sales">Sales</option>
+                <option value="marketing">Marketing</option>
+            </select>
+            <select class="form-select">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="on_leave">On Leave</option>
+            </select>
+        </div>
+        <div class="view-toggle">
+            <button class="btn btn-secondary">Grid</button>
+            <button class="btn btn-primary">Table</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Performance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><div class="avatar">JD</div></td>
+                    <td>EMP001</td>
+                    <td>John Doe</td>
+                    <td>Engineering</td>
+                    <td>Senior Developer</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td>Excellent</td>
+                    <td>
+                        <a href="#" class="btn-action">View</a>
+                        <a href="#" class="btn-action">Edit</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div class="avatar">JS</div></td>
+                    <td>EMP002</td>
+                    <td>Jane Smith</td>
+                    <td>Marketing</td>
+                    <td>Manager</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td>Good</td>
+                    <td>
+                        <a href="#" class="btn-action">View</a>
+                        <a href="#" class="btn-action">Edit</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div class="avatar">MB</div></td>
+                    <td>EMP003</td>
+                    <td>Michael Brown</td>
+                    <td>Sales</td>
+                    <td>Executive</td>
+                    <td><span class="badge badge-warning">On Leave</span></td>
+                    <td>Average</td>
+                    <td>
+                        <a href="#" class="btn-action">View</a>
+                        <a href="#" class="btn-action">Edit</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div class="avatar">EJ</div></td>
+                    <td>EMP004</td>
+                    <td>Emily Johnson</td>
+                    <td>HR</td>
+                    <td>Specialist</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td>Excellent</td>
+                    <td>
+                        <a href="#" class="btn-action">View</a>
+                        <a href="#" class="btn-action">Edit</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div class="avatar">DW</div></td>
+                    <td>EMP005</td>
+                    <td>David Wilson</td>
+                    <td>Engineering</td>
+                    <td>QA Engineer</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td>Good</td>
+                    <td>
+                        <a href="#" class="btn-action">View</a>
+                        <a href="#" class="btn-action">Edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
