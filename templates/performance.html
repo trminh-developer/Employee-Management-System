@@ -1,14 +1,236 @@
 {% extends 'base.html' %}
-{% block title %}Performance - Employee Management{% endblock %}
+{% block title %}Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Performance</h1>
-    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Manage Performance operations.</p>
-</div>
-<div style="padding: 2rem; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
-    <i data-lucide="layout-grid" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
-    <h2>Module In Development</h2>
-    <p>This module is part of the architectural scaffolding and will be expanded shortly.</p>
+<style>
+/* Toolbar Styling */
+.employee-workspace .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: var(--bg-surface);
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.employee-workspace .search-box, 
+.employee-workspace .filters, 
+.employee-workspace .view-toggle {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.employee-workspace .form-input, 
+.employee-workspace .form-select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.employee-workspace .form-input:focus, 
+.employee-workspace .form-select:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+}
+
+.employee-workspace .btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.employee-workspace .btn-primary {
+    background: var(--primary-500);
+    color: white;
+}
+.employee-workspace .btn-primary:hover {
+    background: var(--primary-600);
+}
+
+.employee-workspace .btn-secondary {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+.employee-workspace .btn-secondary:hover {
+    background: var(--bg-surface-alt);
+}
+
+@media (max-width: 768px) {
+    .employee-workspace .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .employee-workspace .search-box {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+    }
+    .employee-workspace .search-box input {
+        flex: 1;
+    }
+    .employee-workspace .filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .employee-workspace .filters select,
+    .employee-workspace .filters button,
+    .employee-workspace .filters a {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    .employee-workspace .filters a#addNew {
+        grid-column: span 2;
+        text-align: center;
+    }
+}
+
+/* Table Styling */
+.table-container {
+    background: var(--bg-surface);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+.data-table th {
+    background-color: var(--bg-surface-alt);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-surface-alt);
+}
+
+/* UI Elements */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-100);
+    color: var(--primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.badge-success { background: #c6f6d5; color: #22543d; }
+.badge-warning { background: #feebc8; color: #7b341e; }
+
+.btn-action {
+    color: var(--primary-500);
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: 600;
+    font-size: 14px;
+}
+.btn-action:hover { color: var(--primary-600); text-decoration: underline; }
+</style>
+
+<div class="employee-workspace">
+    <form method="GET" class="toolbar">
+        <div class="search-box">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Tìm kiếm theo tên hoặc kỳ đánh giá..." class="form-input">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </div>
+        <div class="filters">
+            <button type="submit" class="btn btn-secondary">Lọc</button>
+            {% if request.user.role == 'admin' or request.user.role == 'hr' or request.user.role == 'manager' %}
+            <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/performance/performancereview/add/?_popup=1', 'Thêm Đánh giá mới'); return false;">+ Thêm mới</button>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Kỳ đánh giá</th>
+                    <th>Nhân viên</th>
+                    <th>Người đánh giá</th>
+                    <th>Điểm số</th>
+                    <th>Nhận xét</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rev in reviews %}
+                <tr>
+                    <td><strong>{{ rev.period }}</strong></td>
+                    <td>
+                        <strong>{{ rev.employee.user.get_full_name }}</strong><br>
+                        <small style="color:var(--text-secondary)">{{ rev.employee.employee_id }}</small>
+                    </td>
+                    <td>{{ rev.reviewer.user.get_full_name|default:"-" }}</td>
+                    <td>
+                        <span class="badge {% if rev.score >= 8 %}badge-success{% elif rev.score >= 5 %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ rev.score|floatformat:0 }}/10
+                        </span>
+                    </td>
+                    <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ rev.feedback }}</td>
+                    <td>
+                        {% if request.user.role in 'admin,hr,manager' %}
+                        <a href="#" onclick="openCrudModal('/admin/performance/performancereview/{{ rev.id }}/change/?_popup=1', 'Sửa Đánh giá'); return false;" class="btn-action">Sửa</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center; padding: 30px; color: var(--text-secondary);">
+                        Không tìm thấy đánh giá nào.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
