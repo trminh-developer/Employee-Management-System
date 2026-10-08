@@ -1,85 +1,52 @@
 {% extends 'base.html' %}
-{% load static %}
+{% block title %}Chấm công - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h2>Attendance Management</h2>
-    <div class="header-actions">
-        <button class="btn btn-primary">Export Report</button>
+<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Lịch sử chấm công</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Theo dõi giờ vào/ra của nhân viên.</p>
     </div>
+    <button type="button" id="addNew" class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px;" onclick="openCrudModal('/admin/attendance/attendance/add/?_popup=1', 'Chấm công thủ công'); return false;">Chấm công thủ công</button>
 </div>
 
-<div class="kpi-container">
-    <div class="kpi-card">
-        <div class="kpi-title">Present Today</div>
-        <div class="kpi-value text-success">142</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-title">Late Today</div>
-        <div class="kpi-value text-warning">8</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-title">Absent Today</div>
-        <div class="kpi-value text-danger">4</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h3>Today's Attendance</h3>
-    </div>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Check In</th>
-                    <th>Check Out</th>
-                    <th>Status</th>
-                    <th>Overtime</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>EMP001</td>
-                    <td>John Doe</td>
-                    <td>Engineering</td>
-                    <td>08:50 AM</td>
-                    <td>-</td>
-                    <td><span class="badge badge-success">Present</span></td>
-                    <td>0h</td>
-                </tr>
-                <tr>
-                    <td>EMP002</td>
-                    <td>Jane Smith</td>
-                    <td>Marketing</td>
-                    <td>09:15 AM</td>
-                    <td>-</td>
-                    <td><span class="badge badge-warning">Late</span></td>
-                    <td>0h</td>
-                </tr>
-                <tr>
-                    <td>EMP003</td>
-                    <td>Mike Johnson</td>
-                    <td>Sales</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td><span class="badge badge-danger">Absent</span></td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>EMP004</td>
-                    <td>Emily Davis</td>
-                    <td>HR</td>
-                    <td>08:55 AM</td>
-                    <td>07:30 PM</td>
-                    <td><span class="badge badge-success">Present</span></td>
-                    <td>2.5h</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="table-container" style="background: var(--bg-surface); border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto;">
+    <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: var(--bg-surface-alt); text-transform: uppercase; font-size: 12px; color: var(--text-secondary);">
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Ngày</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Nhân viên</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Phòng ban</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Giờ vào</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Giờ ra</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Trạng thái</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Làm thêm (Giờ)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in records %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.date|date:"d/m/Y" }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);"><strong>{{ rec.employee.user.get_full_name }}</strong></td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.employee.department.name|default:"-" }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.check_in|time:"H:i"|default:"-" }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.check_out|time:"H:i"|default:"-" }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">
+                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
+                    {% if rec.status == 'present' %}background:#c6f6d5;color:#22543d;
+                    {% elif rec.status == 'late' %}background:#feebc8;color:#7b341e;
+                    {% else %}background:#fed7d7;color:#9b2c2c;{% endif %}">
+                        {{ rec.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.overtime_hours }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align:center; padding: 30px; color: var(--text-secondary);">Chưa có dữ liệu chấm công.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
