@@ -1,81 +1,52 @@
 {% extends 'base.html' %}
-{% load static %}
+{% block title %}Bảng lương - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h2>Payroll Processing</h2>
-    <div class="header-actions">
-        <button class="btn btn-secondary">Run Payroll</button>
-        <button class="btn btn-primary">Export</button>
+<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Quản lý Bảng lương</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Tính toán và quản lý lương nhân viên.</p>
     </div>
+    <button type="button" id="addNew" class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px;" onclick="openCrudModal('/admin/payroll/payroll/add/?_popup=1', 'Tính lương tháng này'); return false;">Tính lương tháng này</button>
 </div>
 
-<div class="kpi-container">
-    <div class="kpi-card">
-        <div class="kpi-title">Total Payroll (Nov)</div>
-        <div class="kpi-value">$245,000</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-title">Gross Salary</div>
-        <div class="kpi-value">$210,000</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-title">Total Taxes</div>
-        <div class="kpi-value">$35,000</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h3>Employee Salary Details</h3>
-    </div>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Base Salary</th>
-                    <th>Allowances</th>
-                    <th>Gross Pay</th>
-                    <th>Deductions / Taxes</th>
-                    <th>Net Pay</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>John Doe</td>
-                    <td>$5,000</td>
-                    <td>$500</td>
-                    <td>$5,500</td>
-                    <td>$800</td>
-                    <td><strong>$4,700</strong></td>
-                    <td><span class="badge badge-success">Paid</span></td>
-                    <td><button class="btn btn-sm btn-secondary">Payslip</button></td>
-                </tr>
-                <tr>
-                    <td>Jane Smith</td>
-                    <td>$6,200</td>
-                    <td>$600</td>
-                    <td>$6,800</td>
-                    <td>$1,100</td>
-                    <td><strong>$5,700</strong></td>
-                    <td><span class="badge badge-success">Paid</span></td>
-                    <td><button class="btn btn-sm btn-secondary">Payslip</button></td>
-                </tr>
-                <tr>
-                    <td>Mike Johnson</td>
-                    <td>$4,500</td>
-                    <td>$300</td>
-                    <td>$4,800</td>
-                    <td>$700</td>
-                    <td><strong>$4,100</strong></td>
-                    <td><span class="badge badge-warning">Processing</span></td>
-                    <td><button class="btn btn-sm btn-secondary">Payslip</button></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="table-container" style="background: var(--bg-surface); border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto;">
+    <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: var(--bg-surface-alt); text-transform: uppercase; font-size: 12px; color: var(--text-secondary);">
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Kỳ lương</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Nhân viên</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Lương cơ sở</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thực nhận</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Trạng thái</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in records %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.month }}/{{ rec.year }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);"><strong>{{ rec.employee.user.get_full_name }}</strong></td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">${{ rec.base_salary }}</td>
+                <td style="padding: 16px 20px; font-weight:bold; color: var(--success-600);">${{ rec.net_salary }}</td>
+                <td style="padding: 16px 20px;">
+                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
+                    {% if rec.status == 'paid' %}background:#c6f6d5;color:#22543d;
+                    {% elif rec.status == 'approved' %}background:#bee3f8;color:#2c5282;
+                    {% else %}background:#e2e8f0;color:#4a5568;{% endif %}">
+                        {{ rec.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 16px 20px;">
+                    <a href="{% url 'admin:payroll_payroll_change' rec.id %}?next={{ request.path }}" style="color: var(--primary-500); text-decoration: none; font-weight: 600; margin-right: 10px;">Chi tiết</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center; padding: 30px; color: var(--text-secondary);">Chưa có bản ghi lương nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
