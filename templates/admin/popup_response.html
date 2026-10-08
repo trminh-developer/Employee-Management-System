@@ -1,0 +1,19 @@
+{% load i18n static %}<!DOCTYPE html>
+<html>
+  <head><title>{% translate 'Popup closing…' %}</title></head>
+  <body>
+    <!-- Custom Iframe Popup Handler -->
+    <script>
+      if (window.parent && window.parent !== window) {
+          if (typeof window.parent.closeCrudModal === 'function') {
+              window.parent.closeCrudModal();
+              window.parent.location.reload();
+          }
+      } else if (window.opener) {
+          // Fallback if opened via window.open instead of iframe
+          window.opener.location.reload();
+          window.close();
+      }
+    </script>
+  </body>
+</html>

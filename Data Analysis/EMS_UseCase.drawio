@@ -1,0 +1,72 @@
+<mxfile host="65bd71144e">
+    <diagram name="Use Case Diagram" id="EMS-UC">
+        <mxGraphModel dx="908" dy="603" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="boundary" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="Employee Management System" vertex="1">
+                    <mxGeometry height="620" width="350" x="280" y="170" as="geometry">
+                        <mxRectangle height="30" width="210" x="280" y="170" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="uc1" parent="boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Manage Users &amp; Roles" vertex="1">
+                    <mxGeometry height="50" width="140" x="105" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="uc2" parent="boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Manage Employees" vertex="1">
+                    <mxGeometry height="50" width="140" x="105" y="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="uc3" parent="boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Manage Payroll" vertex="1">
+                    <mxGeometry height="50" width="140" x="105" y="250" as="geometry"/>
+                </mxCell>
+                <mxCell id="uc4" parent="boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Approve Leave" vertex="1">
+                    <mxGeometry height="50" width="140" x="105" y="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="uc5" parent="boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Submit Leave" vertex="1">
+                    <mxGeometry height="50" width="140" x="105" y="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="uc6" parent="boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Check-in / out" vertex="1">
+                    <mxGeometry height="50" width="140" x="105" y="550" as="geometry"/>
+                </mxCell>
+                <mxCell id="admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" value="System Admin" vertex="1">
+                    <mxGeometry height="60" width="30" x="100" y="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="hr" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" value="HR" vertex="1">
+                    <mxGeometry height="60" width="30" x="100" y="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="manager" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" value="Manager" vertex="1">
+                    <mxGeometry height="60" width="30" x="700" y="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="employee" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" value="Employee" vertex="1">
+                    <mxGeometry height="60" width="30" x="700" y="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge1" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="120.00000000000011" as="sourcePoint"/>
+                        <mxPoint x="455" y="209.9999999999999" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge2" edge="1" parent="1" source="hr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="uc2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge3" edge="1" parent="1" source="hr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="uc3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge4" edge="1" parent="1" source="hr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="uc4">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge6" edge="1" parent="1" source="employee" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="uc5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge7" edge="1" parent="1" source="employee" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="uc6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge5" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="700" y="179.9999999999999" as="sourcePoint"/>
+                        <mxPoint x="455" y="520" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

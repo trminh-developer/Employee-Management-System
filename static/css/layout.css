@@ -122,6 +122,16 @@
     overflow: hidden;
 }
 
+.sidebar.collapsed .user-info {
+    display: none;
+}
+
+.sidebar.collapsed .user-profile-mini {
+    justify-content: center;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 /* --- Main Content Area --- */
 .main-wrapper {
     flex: 1;
@@ -223,10 +233,9 @@
 }
 
 /* --- Page Content --- */
-.page-content {
+.content {
     flex: 1;
     overflow-y: auto;
-    padding: 2rem;
     background-color: var(--bg-body);
 }
 
@@ -246,3 +255,43 @@
         display: none; /* Hide full search bar on mobile, could add icon */
     }
 }
+
+/* MOBILE RESPONSIVE OVERRIDES */
+@media (max-width: 1024px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .charts-section { flex-direction: column !important; }
+}
+
+@media (max-width: 768px) {
+    .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); z-index: 9999; }
+    .sidebar.mobile-open { transform: translateX(0); }
+    .search-container { display: none; }
+    
+    /* Make data tables horizontally scrollable */
+    .table-container, .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; } .data-table { white-space: nowrap; }
+    
+    /* KPI Grid to 1 column */
+    .kpi-grid { grid-template-columns: 1fr !important; }
+    
+    /* Profile forms grid to 1 column */
+    .grid-layout { grid-template-columns: 1fr !important; }
+    
+    /* Modals should fit screen */
+    .modal-content { width: 95% !important; margin-top: 5vh !important; }
+    
+    /* Header padding */
+    .page-content { padding: 1rem !important; }
+    .dashboard-header-wrapper { padding: 1rem !important; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 100px; }
+    .page-header h1 { font-size: 1.5rem !important; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .profile-title { margin-left: 0 !important; margin-top: 15px; }
+}
+
+@media (max-width: 768px) {
+    #mobile-menu-btn { display: flex !important; }
+}
+
+@media (max-width: 768px) { .hide-on-mobile { display: none !important; } }
+
+body.popup-mode .main-wrapper { margin-left: 0 !important; }
+body.popup-mode .content { padding: 1rem !important; }

@@ -1,182 +1,679 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - Employee Management{% endblock %}
+{% block title %}Dashboard - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
-{% block extra_head %}
-<!-- Chart.js via CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_css %}
 <style>
-    /* Add canvas background styles to dashboard header */
-    .dashboard-header-wrapper {
-        position: relative;
-        overflow: hidden;
-        border-radius: var(--radius-lg);
-        background: linear-gradient(135deg, var(--bg-surface) 0%, var(--primary-50) 100%);
-        border: 1px solid var(--border-color);
-        margin-bottom: 2rem;
-        min-height: 120px;
+    /* CSS Variables specific to Dashboard */
+    :root {
+        --dash-bg: #f8fafc;
+        --card-bg: #ffffff;
+        --border-light: #e2e8f0;
+        --text-main: #1e293b;
+        --text-sub: #64748b;
+        --primary-blue: #4f46e5;
+        --success-green: #10b981;
+        --warning-amber: #f59e0b;
+        --danger-red: #ef4444;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        --radius-card: 14px;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+        padding: 0 0 30px 0;
+        background: var(--dash-bg);
+        min-height: 100vh;
+    }
+
+    /* Header */
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .dash-title h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
+    }
+    .dash-title p {
+        margin: 4px 0 0 0;
+        font-size: 14px;
+        color: var(--text-sub);
+    }
+    .dash-actions select {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-light);
+        background: var(--card-bg);
+        color: var(--text-main);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        outline: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Grid System */
+    .dash-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 20px;
+    }
+
+    /* Cards */
+    .dash-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-card);
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .dash-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+    .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0 0 16px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* KPI Row */
+    .kpi-row {
+        grid-column: span 12;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    .kpi-card {
+        display: flex;
+        flex-direction: column;
+    }
+    .kpi-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    .kpi-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-sub);
+    }
+    .kpi-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
-        padding: 0 2rem;
+        justify-content: center;
     }
-    #network-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
+    .icon-blue { background: #eff6ff; color: #3b82f6; }
+    .icon-green { background: #f0fdf4; color: #22c55e; }
+    .icon-purple { background: #faf5ff; color: #a855f7; }
+    .icon-orange { background: #fff7ed; color: #f97316; }
+    
+    .kpi-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        letter-spacing: -1px;
+    }
+    .kpi-trend {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .trend-up { color: var(--success-green); font-weight: 600; }
+    .trend-down { color: var(--danger-red); font-weight: 600; }
+    .trend-text { color: var(--text-sub); }
+
+    /* Analytics Row */
+    .chart-growth { grid-column: span 8; min-height: 320px; }
+    .chart-attendance { grid-column: span 4; min-height: 320px; }
+
+    /* Bottom Row */
+    .chart-dept { grid-column: span 8; min-height: 320px; }
+    .card-pending { grid-column: span 4; min-height: 320px; }
+
+    /* Activities Row */
+    .card-activity { grid-column: span 12; }
+
+    /* Chart Containers */
+    .canvas-container {
+        flex: 1;
+        position: relative;
         width: 100%;
         height: 100%;
-        z-index: 0;
-        pointer-events: auto; /* Allow mouse interaction */
+        min-height: 220px;
     }
-    .page-header {
-        position: relative;
-        z-index: 1;
-        border: none;
+
+    /* Custom Attendance Stats */
+    .attendance-stats {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+    }
+    .stat-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    /* Pending Actions */
+    .pending-list {
+        list-style: none;
+        padding: 0;
         margin: 0;
-        background: transparent;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .pending-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .pending-item:hover {
+        background: #f1f5f9;
+    }
+    .pending-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-main);
+    }
+    .pending-badge {
+        background: var(--danger-red);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Recent Activities */
+    .activity-table {
         width: 100%;
+        border-collapse: collapse;
     }
-    .page-header h1 {
-        margin: 0;
-        font-size: 2rem;
+    .activity-table th, .activity-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-light);
     }
-    [data-theme='dark'] .dashboard-header-wrapper {
-        background: linear-gradient(135deg, var(--bg-surface) 0%, var(--sidebar-bg) 100%);
+    .activity-table th {
+        color: var(--text-sub);
+        font-size: 13px;
+        font-weight: 500;
+        text-transform: uppercase;
+        background: #f8fafc;
+    }
+    .activity-table td {
+        font-size: 14px;
+        color: var(--text-main);
+    }
+    .activity-table tr:last-child td {
+        border-bottom: none;
+    }
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+    }
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-approved { background: #dcfce7; color: #166534; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-quick {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-light);
+        background: var(--card-bg);
+        color: var(--text-main);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .btn-quick:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .kpi-row { grid-template-columns: repeat(2, 1fr); }
+        .chart-growth, .chart-dept { grid-column: span 12; }
+        .chart-attendance, .card-pending { grid-column: span 12; }
+    }
+    @media (max-width: 768px) {
+        .kpi-row { grid-template-columns: 1fr; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-header-wrapper">
-    <canvas id="network-canvas"></canvas>
-    <div class="page-header">
-        <h1>Dashboard</h1>
-        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Intelligent Insights & Overview</p>
+<div class="dashboard-container">
+    
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="dash-title">
+            <h1>Tổng quan</h1>
+            <p>Số liệu phân tích & Toàn cảnh nhân sự</p>
+        </div>
+        <div class="dash-actions">
+            <select>
+                <option>Hôm nay</option>
+                <option>Tuần này</option>
+                <option>Tháng này</option>
+                <option selected>Quý này</option>
+                <option>Năm nay</option>
+            </select>
+        </div>
     </div>
-</div>
 
-<div class="kpi-grid">
-    <!-- Card 1 -->
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <h3>Total Employees</h3>
-            <span class="kpi-icon">👥</span>
-        </div>
-        <div class="kpi-value">1,245</div>
-        <div class="kpi-trend positive">
-            <span class="trend-icon">↑</span> 12% from last month
-        </div>
-    </div>
-    <!-- Card 2 -->
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <h3>Active</h3>
-            <span class="kpi-icon">🟢</span>
-        </div>
-        <div class="kpi-value">1,180</div>
-        <div class="kpi-trend positive">
-            <span class="trend-icon">↑</span> 5% from last month
-        </div>
-    </div>
-    <!-- Card 3 -->
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <h3>On Leave</h3>
-            <span class="kpi-icon">⛱️</span>
-        </div>
-        <div class="kpi-value">45</div>
-        <div class="kpi-trend negative">
-            <span class="trend-icon">↓</span> 2% from last month
-        </div>
-    </div>
-    <!-- Card 4 -->
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <h3>New Hires</h3>
-            <span class="kpi-icon">🎉</span>
-        </div>
-        <div class="kpi-value">20</div>
-        <div class="kpi-trend positive">
-            <span class="trend-icon">↑</span> 8% from last month
-        </div>
-    </div>
-</div>
+    <!-- Main Grid -->
+    <div class="dash-grid">
+        
+        <!-- ROW 1: KPIs -->
+        <div class="kpi-row">
+            <div class="dash-card kpi-card">
+                <div class="kpi-top">
+                    <span class="kpi-label">Tổng nhân sự</span>
+                    <div class="kpi-icon icon-blue"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
+                </div>
+                <div class="kpi-value">{{ total_employees|default:"1,250" }}</div>
+                <div class="kpi-trend">
+                    <span class="trend-up">↑ 8.2%</span>
+                    <span class="trend-text">so với tháng trước</span>
+                </div>
+            </div>
 
-<div class="charts-section">
-    <div class="chart-container">
-        <h3>Employee Growth</h3>
-        <canvas id="growthChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <h3>Department Distribution</h3>
-        <canvas id="deptChart"></canvas>
-    </div>
-</div>
+            <div class="dash-card kpi-card">
+                <div class="kpi-top">
+                    <span class="kpi-label">Đang làm việc</span>
+                    <div class="kpi-icon icon-green"><i data-lucide="user-check" style="width:20px;height:20px;"></i></div>
+                </div>
+                <div class="kpi-value">{{ active_employees|default:"1,180" }}</div>
+                <div class="kpi-trend">
+                    <span class="trend-up">↑ 4.1%</span>
+                    <span class="trend-text">so với tháng trước</span>
+                </div>
+            </div>
 
-<div class="recent-activity">
-    <h3>Recent Activity</h3>
-    <ul class="activity-timeline">
-        <li class="activity-item">
-            <div class="activity-time">10:00 AM</div>
-            <div class="activity-content"><strong>John Doe</strong> joined the Engineering department.</div>
-        </li>
-        <li class="activity-item">
-            <div class="activity-time">09:15 AM</div>
-            <div class="activity-content"><strong>Jane Smith</strong> requested annual leave.</div>
-        </li>
-        <li class="activity-item">
-            <div class="activity-time">Yesterday</div>
-            <div class="activity-content"><strong>Michael Brown</strong> updated his profile picture.</div>
-        </li>
-    </ul>
+            <div class="dash-card kpi-card">
+                <div class="kpi-top">
+                    <span class="kpi-label">Điểm danh hôm nay</span>
+                    <div class="kpi-icon icon-purple"><i data-lucide="clock" style="width:20px;height:20px;"></i></div>
+                </div>
+                <div class="kpi-value">{{ today_attendance|default:"1,095" }}</div>
+                <div class="kpi-trend">
+                    <span class="trend-up">↑ 2.8%</span>
+                    <span class="trend-text">so với hôm qua</span>
+                </div>
+            </div>
+
+            <div class="dash-card kpi-card">
+                <div class="kpi-top">
+                    <span class="kpi-label">Phòng ban</span>
+                    <div class="kpi-icon icon-orange"><i data-lucide="building" style="width:20px;height:20px;"></i></div>
+                </div>
+                <div class="kpi-value">{{ total_departments|default:"12" }}</div>
+                <div class="kpi-trend">
+                    <span class="trend-up">+1 mới</span>
+                    <span class="trend-text">trong quý này</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: Analytics -->
+        <div class="dash-card chart-growth">
+            <div class="card-title">
+                Tăng trưởng nhân sự
+                <select style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 13px;">
+                    <option>6 tháng</option>
+                    <option>12 tháng</option>
+                </select>
+            </div>
+            <div class="canvas-container">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dash-card chart-attendance">
+            <div class="card-title">Điểm danh hôm nay</div>
+            <div class="canvas-container" style="min-height: 160px; max-height: 200px;">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <div class="attendance-stats">
+                <div class="stat-row">
+                    <div><span class="stat-dot" style="background:#10b981;"></span>Có mặt</div>
+                    <strong style="color:var(--text-main);">{{ today_attendance|default:"820" }}</strong>
+                </div>
+                <div class="stat-row">
+                    <div><span class="stat-dot" style="background:#f59e0b;"></span>Đi muộn</div>
+                    <strong style="color:var(--text-main);">45</strong>
+                </div>
+                <div class="stat-row">
+                    <div><span class="stat-dot" style="background:#ef4444;"></span>Vắng mặt</div>
+                    <strong style="color:var(--text-main);">18</strong>
+                </div>
+                <div class="stat-row">
+                    <div><span class="stat-dot" style="background:#8b5cf6;"></span>Nghỉ phép</div>
+                    <strong style="color:var(--text-main);">32</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: Department & Pending -->
+        <div class="dash-card chart-dept">
+            <div class="card-title">Cơ cấu nhân sự theo phòng ban</div>
+            <div class="canvas-container">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dash-card card-pending">
+            <div class="card-title">Cần xử lý</div>
+            <ul class="pending-list">
+                <li class="pending-item" onclick="window.location.href='/leave/'">
+                    <div class="pending-left">
+                        <i data-lucide="calendar-clock" style="width:18px;height:18px;color:#64748b;"></i>
+                        Yêu cầu nghỉ phép
+                    </div>
+                    <span class="pending-badge">{{ pending_leaves|default:"12" }}</span>
+                </li>
+                <li class="pending-item" onclick="window.location.href='/employees/'">
+                    <div class="pending-left">
+                        <i data-lucide="users" style="width:18px;height:18px;color:#64748b;"></i>
+                        Hồ sơ nhân viên
+                    </div>
+                    <span class="pending-badge" style="background:var(--warning-amber);">05</span>
+                </li>
+                <li class="pending-item" onclick="window.location.href='/performance/'">
+                    <div class="pending-left">
+                        <i data-lucide="target" style="width:18px;height:18px;color:#64748b;"></i>
+                        Đánh giá hiệu suất
+                    </div>
+                    <span class="pending-badge" style="background:var(--primary-blue);">08</span>
+                </li>
+                <li class="pending-item">
+                    <div class="pending-left">
+                        <i data-lucide="refresh-cw" style="width:18px;height:18px;color:#64748b;"></i>
+                        Yêu cầu cập nhật
+                    </div>
+                    <span class="pending-badge" style="background:var(--text-sub);">03</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ROW 4: Recent Activity -->
+        <div class="dash-card card-activity">
+            <div class="card-title">
+                Hoạt động gần đây
+                <div class="quick-actions">
+                    <button class="btn-quick" onclick="openCrudModal('/admin/employees/employee/add/?_popup=1', 'Thêm nhân viên'); return false;"><i data-lucide="plus" style="width:14px;height:14px;"></i> Thêm nhân viên</button>
+                    <button class="btn-quick" onclick="window.location.href='/reports/'"><i data-lucide="file-text" style="width:14px;height:14px;"></i> Tạo báo cáo</button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Người thực hiện</th>
+                            <th>Hành động</th>
+                            <th>Thời gian</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in recent_leaves %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar-sm">{{ req.employee.user.first_name|first|default:"U" }}</div>
+                                    <span style="font-weight: 500;">{{ req.employee.user.get_full_name }}</span>
+                                </div>
+                            </td>
+                            <td>Gửi yêu cầu nghỉ phép ({{ req.get_leave_type_display }})</td>
+                            <td style="color: var(--text-sub);">{{ req.created_at|timesince }} trước</td>
+                            <td>
+                                <span class="status-badge {% if req.status == 'approved' %}status-approved{% elif req.status == 'rejected' %}status-rejected{% else %}status-pending{% endif %}">
+                                    {{ req.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-sub); padding: 30px;">
+                                Chưa có hoạt động nào gần đây.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<!-- Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Employee Growth Chart
-        const growthCtx = document.getElementById('growthChart').getContext('2d');
+        // Shared Options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 12,
+                    titleFont: { size: 13, family: 'Inter' },
+                    bodyFont: { size: 13, family: 'Inter' },
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            }
+        };
+
+        // 1. Employee Growth (Area Chart)
+        const growthCtx = document.getElementById('growthChart');
         if (growthCtx) {
+            const gradient = growthCtx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
             new Chart(growthCtx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                     datasets: [{
-                        label: 'Employees',
-                        data: [1150, 1170, 1190, 1210, 1235, 1245],
-                        borderColor: '#2563eb',
-                        tension: 0.1,
-                        fill: false
+                        label: 'Số nhân viên',
+                        data: [1120, 1145, 1150, 1180, 1210, 1250],
+                        borderColor: '#4f46e5',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#4f46e5',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { color: '#64748b', font: { family: 'Inter' } }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#64748b', font: { family: 'Inter' } }
+                        }
+                    }
                 }
             });
         }
 
-        // Department Distribution Chart
-        const deptCtx = document.getElementById('deptChart').getContext('2d');
-        if (deptCtx) {
-            new Chart(deptCtx, {
+        // 2. Attendance Overview (Doughnut)
+        const attendanceCtx = document.getElementById('attendanceChart');
+        if (attendanceCtx) {
+            new Chart(attendanceCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance'],
+                    labels: ['Có mặt', 'Đi muộn', 'Vắng mặt', 'Nghỉ phép'],
                     datasets: [{
-                        data: [450, 300, 200, 150, 145],
-                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+                        data: [820, 45, 18, 32],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            bodyFont: { size: 13, family: 'Inter' },
+                            cornerRadius: 8,
+                            displayColors: true
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'textCenter',
+                    beforeDraw: function(chart) {
+                        var width = chart.width,
+                            height = chart.height,
+                            ctx = chart.ctx;
+                        ctx.restore();
+                        var fontSize = (height / 114).toFixed(2);
+                        ctx.font = "bold " + fontSize + "em Inter";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#1e293b";
+                        var text = "82%",
+                            textX = Math.round((width - ctx.measureText(text).width) / 2),
+                            textY = height / 2 - 10;
+                        ctx.fillText(text, textX, textY);
+                        
+                        ctx.font = "500 0.8em Inter";
+                        ctx.fillStyle = "#64748b";
+                        var subText = "Có mặt",
+                            subX = Math.round((width - ctx.measureText(subText).width) / 2),
+                            subY = height / 2 + 15;
+                        ctx.fillText(subText, subX, subY);
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+
+        // 3. Department Overview (Horizontal Bar)
+        const deptCtx = document.getElementById('deptChart');
+        if (deptCtx) {
+            new Chart(deptCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ dept_labels|safe|default:"['IT', 'HR', 'Finance', 'Marketing', 'Sales']" }},
+                    datasets: [{
+                        label: 'Số lượng',
+                        data: {{ dept_counts|safe|default:"[35, 12, 18, 25, 42]" }},
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    indexAxis: 'y', // Makes it horizontal
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { color: '#64748b', font: { family: 'Inter' } }
+                        },
+                        y: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#1e293b', font: { family: 'Inter', weight: '500' } }
+                        }
+                    }
                 }
             });
         }
     });
 </script>
-<script src="{% static 'js/canvas-animation.js' %}"></script>
 {% endblock %}

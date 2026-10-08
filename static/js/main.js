@@ -20,9 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Check local storage for theme
     const currentTheme = localStorage.getItem('theme');
+    const updateThemeIcon = () => {
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (icon) {
+                if (body.classList.contains('dark-mode')) {
+                    icon.setAttribute('data-lucide', 'sun');
+                } else {
+                    icon.setAttribute('data-lucide', 'moon');
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        }
+    };
+
     if (currentTheme === 'dark') {
         body.classList.add('dark-mode');
     }
+    updateThemeIcon();
 
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
@@ -33,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 theme = 'dark';
             }
             localStorage.setItem('theme', theme);
+            updateThemeIcon();
         });
     }
 
@@ -43,8 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             if (commandPalette) {
-                commandPalette.classList.toggle('open');
-                if (commandPalette.classList.contains('open')) {
+                commandPalette.classList.toggle('active');
+                if (commandPalette.classList.contains('active')) {
                     const searchInput = commandPalette.querySelector('input');
                     if (searchInput) searchInput.focus();
                 }
@@ -52,8 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Close with Escape
-        if (e.key === 'Escape' && commandPalette && commandPalette.classList.contains('open')) {
-            commandPalette.classList.remove('open');
+        if (e.key === 'Escape' && commandPalette && commandPalette.classList.contains('active')) {
+            commandPalette.classList.remove('active');
         }
     });
 
@@ -61,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (commandPalette) {
         commandPalette.addEventListener('click', (e) => {
             if (e.target === commandPalette) {
-                commandPalette.classList.remove('open');
+                commandPalette.classList.remove('active');
             }
         });
     }
@@ -84,6 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 previewDrawer.classList.remove('open');
             });
         }
+    }
+
+    // Profile Dropdown Logic
+    const profileTrigger = document.getElementById('profile-dropdown-trigger');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    if (profileTrigger && profileDropdown) {
+        profileTrigger.addEventListener('click', (e) => {
+            // Prevent event from bubbling up to document
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        });
     }
 
     // Tab Switching Logic

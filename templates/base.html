@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Management System</title>
+    <title>Hệ Thống Quản Lý Nhân Sự</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,114 +12,277 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}">
-    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}?v=2">
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if '_popup' in request.GET %}popup-mode{% endif %}">
     <div class="app-container">
         <!-- Sidebar -->
+        {% if '_popup' not in request.GET %}
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
-                    <i data-lucide="building-2"></i> EMS Portal
+                    <i data-lucide="building-2"></i> HR Portal
                 </div>
-                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle Sidebar">
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Đóng/Mở thanh bên">
                     <i data-lucide="menu"></i>
                 </button>
             </div>
             
             <div class="user-profile-mini" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.75rem;">
-                <div class="avatar" style="background: var(--primary-100); color: var(--primary-700); font-weight: 600;">{{ request.user.username|slice:":2"|upper|default:"AD" }}</div>
+                <div class="avatar" style="background: var(--primary-100); color: var(--primary-700); font-weight: 600; overflow: hidden;">
+                    {% if request.user.employee_profile and request.user.employee_profile.avatar %}
+                        <img src="{{ request.user.employee_profile.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                    {% else %}
+                        {{ request.user.username|slice:":2"|upper|default:"QT" }}
+                    {% endif %}
+                </div>
                 <div class="user-info" style="display: flex; flex-direction: column;">
                     <span class="user-name" style="font-weight: 600; font-size: 0.875rem;">{{ request.user.get_full_name|default:request.user.username }}</span>
-                    <span class="user-role" style="font-size: 0.75rem; color: var(--text-secondary); text-transform: capitalize;">{{ request.user.role|default:"Administrator" }}</span>
+                    <span class="user-role" style="font-size: 0.75rem; color: var(--text-secondary); text-transform: capitalize;">{{ request.user.role|default:"Quản trị viên" }}</span>
                 </div>
             </div>
             
             <nav class="sidebar-nav">
                 <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i data-lucide="layout-dashboard" class="nav-icon"></i>
-                    <span class="nav-text">Dashboard</span>
+                    <span class="nav-text">Tổng quan</span>
                 </a>
                 <a href="{% url 'employees:list' %}" class="nav-item {% if request.resolver_match.app_name == 'employees' %}active{% endif %}">
                     <i data-lucide="users" class="nav-icon"></i>
-                    <span class="nav-text">Employees</span>
+                    <span class="nav-text">Nhân viên</span>
                 </a>
                 <a href="{% url 'departments:list' %}" class="nav-item {% if request.resolver_match.app_name == 'departments' %}active{% endif %}">
                     <i data-lucide="network" class="nav-icon"></i>
-                    <span class="nav-text">Departments</span>
+                    <span class="nav-text">Phòng ban</span>
                 </a>
                 <a href="{% url 'attendance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'attendance' %}active{% endif %}">
                     <i data-lucide="clock" class="nav-icon"></i>
-                    <span class="nav-text">Attendance</span>
+                    <span class="nav-text">Chấm công</span>
                 </a>
                 <a href="{% url 'leave:list' %}" class="nav-item {% if request.resolver_match.app_name == 'leave' %}active{% endif %}">
                     <i data-lucide="calendar-off" class="nav-icon"></i>
-                    <span class="nav-text">Leave</span>
+                    <span class="nav-text">Nghỉ phép</span>
                 </a>
                 <a href="{% url 'payroll:list' %}" class="nav-item {% if request.resolver_match.app_name == 'payroll' %}active{% endif %}">
                     <i data-lucide="banknote" class="nav-icon"></i>
-                    <span class="nav-text">Payroll</span>
+                    <span class="nav-text">Bảng lương</span>
                 </a>
                 <a href="{% url 'performance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'performance' %}active{% endif %}">
                     <i data-lucide="trending-up" class="nav-icon"></i>
-                    <span class="nav-text">Performance</span>
+                    <span class="nav-text">Đánh giá</span>
                 </a>
                 <a href="{% url 'reports:list' %}" class="nav-item {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
                     <i data-lucide="pie-chart" class="nav-icon"></i>
-                    <span class="nav-text">Reports</span>
+                    <span class="nav-text">Báo cáo</span>
                 </a>
                 <a href="{% url 'notifications:list' %}" class="nav-item {% if request.resolver_match.app_name == 'notifications' %}active{% endif %}">
                     <i data-lucide="bell" class="nav-icon"></i>
-                    <span class="nav-text">Notifications</span>
+                    <span class="nav-text">Thông báo</span>
                 </a>
+                {% if request.user.role == 'admin' %}
+                <a href="{% url 'accounts:user_list' %}" class="nav-item {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+                    <i data-lucide="shield" class="nav-icon"></i>
+                    <span class="nav-text">Quản lý Tài khoản</span>
+                </a>
+                {% endif %}
             </nav>
         </aside>
+        {% endif %}
 
         <!-- Main Wrapper -->
         <main class="main-wrapper">
+            {% if '_popup' not in request.GET %}
             <header class="topbar">
+                <button id="mobile-menu-btn" class="action-btn" style="display: none; margin-right: 10px;" aria-label="Mở Menu">
+                    <i data-lucide="menu"></i>
+                </button>
                 <div class="search-container">
                     <button class="search-trigger" onclick="document.getElementById('command-palette').classList.add('open')">
                         <i data-lucide="search"></i>
-                        <span>Search employees, departments...</span>
+                        <span>Tìm kiếm nhân viên, phòng ban...</span>
                         <span class="search-shortcut">Ctrl+K</span>
                     </button>
                 </div>
                 
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" style="padding: 0.5rem 1rem;">
-                        <i data-lucide="plus"></i> Add
-                    </button>
                     <button id="theme-toggle" class="action-btn" aria-label="Toggle Dark Mode">
                         <i data-lucide="moon"></i>
                     </button>
-                    <button class="action-btn">
+                    <a href="{% url 'notifications:list' %}" class="action-btn" style="text-decoration: none;">
                         <i data-lucide="bell"></i>
-                    </button>
-                    <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="avatar avatar-sm">{{ request.user.username|slice:":2"|upper|default:"AD" }}</div>
-                        <form method="post" action="{% url 'accounts:logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="action-btn" aria-label="Logout" title="Logout">
-                                <i data-lucide="log-out"></i>
-                            </button>
-                        </form>
+                    </a>
+                    <div class="user-profile dropdown-container" id="profile-dropdown-trigger" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <div class="avatar avatar-sm" style="overflow: hidden;">
+                            {% if request.user.employee_profile and request.user.employee_profile.avatar %}
+                                <img src="{{ request.user.employee_profile.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                            {% else %}
+                                {{ request.user.username|slice:":2"|upper|default:"AD" }}
+                            {% endif %}
+                        </div>
+                        <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-secondary);"></i>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="profile-dropdown" class="dropdown-menu">
+                            <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;">
+                                <strong style="color: var(--text-primary); display: block;">{{ request.user.get_full_name|default:request.user.username }}</strong>
+                                <small style="color: var(--text-secondary);">{{ request.user.email|default:"admin@example.com" }}</small>
+                            </div>
+                            
+                            <a href="{% url 'employees:my_profile' %}" class="dropdown-item">
+                                <i data-lucide="user" style="width: 16px; height: 16px;"></i> Xem hồ sơ
+                            </a>
+                            
+                            <a href="/admin/password_change/" class="dropdown-item">
+                                <i data-lucide="settings" style="width: 16px; height: 16px;"></i> Cài đặt
+                            </a>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <form method="post" action="{% url 'accounts:logout' %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item" style="color: var(--danger-500);">
+                                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Đăng xuất
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </header>
+            {% endif %}
 
             <div class="content" style="padding: 2rem;">
                 {% block content %}{% endblock %}
             </div>
         </main>
     </div>
+    
+    <!-- Command Palette Modal -->
+    <div id="command-palette" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 600px; margin-top: 10vh; align-self: flex-start;">
+            <div style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+                <form action="{% url 'employees:list' %}" method="GET" style="display: flex; align-items: center; gap: 12px; margin: 0;">
+                    <i data-lucide="search" style="color: var(--text-muted); width: 20px; height: 20px;"></i>
+                    <input type="text" name="q" placeholder="Tìm kiếm nhân viên..." autofocus
+                           style="flex: 1; border: none; outline: none; background: transparent; font-size: 16px; color: var(--text-primary);">
+                    <button type="submit" style="display: none;"></button>
+                </form>
+            </div>
+            <div style="padding: 16px;">
+                <p style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Truy cập nhanh</p>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <a href="{% url 'employees:list' %}" style="padding: 10px 12px; display: flex; align-items: center; gap: 12px; color: var(--text-primary); text-decoration: none; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-surface-hover)'" onmouseout="this.style.background='transparent'">
+                        <i data-lucide="users" style="width: 16px; height: 16px; color: var(--primary-500);"></i>
+                        Danh sách Nhân viên
+                    </a>
+                    <a href="{% url 'departments:list' %}" style="padding: 10px 12px; display: flex; align-items: center; gap: 12px; color: var(--text-primary); text-decoration: none; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-surface-hover)'" onmouseout="this.style.background='transparent'">
+                        <i data-lucide="network" style="width: 16px; height: 16px; color: var(--success-500);"></i>
+                        Danh sách Phòng ban
+                    </a>
+                    <a href="{% url 'leave:list' %}" style="padding: 10px 12px; display: flex; align-items: center; gap: 12px; color: var(--text-primary); text-decoration: none; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-surface-hover)'" onmouseout="this.style.background='transparent'">
+                        <i data-lucide="calendar-off" style="width: 16px; height: 16px; color: var(--warning-500);"></i>
+                        Đơn xin nghỉ phép
+                    </a>
+                    <a href="{% url 'employees:my_profile' %}" style="padding: 10px 12px; display: flex; align-items: center; gap: 12px; color: var(--text-primary); text-decoration: none; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-surface-hover)'" onmouseout="this.style.background='transparent'">
+                        <i data-lucide="user" style="width: 16px; height: 16px; color: var(--danger-500);"></i>
+                        Hồ sơ cá nhân
+                    </a>
+                </div>
+            </div>
+            <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between;">
+                <span>Nhập để tìm kiếm</span>
+                <span>ESC để đóng</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Iframe CRUD Modal -->
+    <div id="crud-modal" class="modal-overlay" style="z-index: 3000;">
+        <div class="modal-content" style="width: 90%; max-width: 900px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; background: #f8f9fa;">
+            <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: white;">
+                <h3 id="crud-modal-title" style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">Chỉnh sửa</h3>
+                <button onclick="closeCrudModal()" style="background: none; border: none; cursor: pointer; color: var(--text-muted);"><i data-lucide="x"></i></button>
+            </div>
+            <iframe id="crud-iframe" style="flex: 1; width: 100%; border: none;" onload="onCrudIframeLoad()"></iframe>
+        </div>
+    </div>
 
     <!-- Script -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        function openCrudModal(url, title) {
+            document.getElementById('crud-modal-title').innerText = title || 'Chỉnh sửa';
+            if (!url.includes('_popup=1')) {
+                url += url.includes('?') ? '&_popup=1' : '?_popup=1';
+            }
+            document.getElementById('crud-iframe').src = url;
+            document.getElementById('crud-modal').classList.add('active');
+        }
+        
+        function closeCrudModal() {
+            document.getElementById('crud-modal').classList.remove('active');
+            document.getElementById('crud-iframe').src = '';
+        }
+        
+        function onCrudIframeLoad() {
+            const iframe = document.getElementById('crud-iframe');
+            try {
+                const content = iframe.contentWindow.document.body.innerHTML;
+                if (content.includes('dismissChangeRelatedObjectPopup') || content.includes('dismissAddRelatedObjectPopup') || iframe.contentWindow.location.pathname === '/') {
+                    closeCrudModal();
+                    window.location.reload();
+                }
+            } catch (e) {
+                // Ignore cross-origin errors if any
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a').forEach(a => {
+                const href = a.getAttribute('href');
+                if (href && ((href.includes('/admin/') && (href.includes('/change/') || href.includes('/add/'))) || a.classList.contains('popup-link'))) {
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const title = a.innerText.trim() === 'Sửa' ? 'Chỉnh sửa dữ liệu' : (a.innerText.trim() === 'Xem' ? 'Xem chi tiết' : (a.innerText.trim() || 'Thêm dữ liệu'));
+                        openCrudModal(href, title);
+                    });
+                }
+            });
+            // Also override onclick buttons
+            document.querySelectorAll('button').forEach(btn => {
+                const onclick = btn.getAttribute('onclick');
+                if (onclick && onclick.includes('window.location.href=') && onclick.includes('/admin/')) {
+                    const match = onclick.match(/href=['"](.*?)['"]/);
+                    if (match && match[1]) {
+                        btn.removeAttribute('onclick');
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            openCrudModal(match[1], btn.innerText.trim());
+                        });
+                    }
+                }
+            });
+            
+            // Mobile Menu
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            if(mobileBtn) {
+                mobileBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-open');
+                });
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open') && !sidebar.contains(e.target) && !mobileBtn.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+        });
+    </script>
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

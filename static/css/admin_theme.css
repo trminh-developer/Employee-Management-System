@@ -1,0 +1,121 @@
+/* Override Django Admin Dark Mode */
+:root {
+    color-scheme: light !important;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #4f46e5 !important;
+        --secondary: #4338ca !important;
+        --accent: #4f46e5 !important;
+        --primary-fg: #fff !important;
+        --body-fg: #1e293b !important;
+        --body-bg: #ffffff !important;
+        --body-quiet-color: #64748b !important;
+        --body-loud-color: #0f172a !important;
+        --header-color: #f8fafc !important;
+        --header-branding-color: #ffffff !important;
+        --header-bg: #4f46e5 !important;
+        --header-link-color: #ffffff !important;
+        --breadcrumbs-fg: #4f46e5 !important;
+        --breadcrumbs-link-fg: #f8fafc !important;
+        --breadcrumbs-bg: #4f46e5 !important;
+        --link-fg: #4f46e5 !important;
+        --link-hover-color: #4338ca !important;
+        --link-selected-fg: #4f46e5 !important;
+        --hairline-color: #e2e8f0 !important;
+        --border-color: #cbd5e1 !important;
+        --error-fg: #ef4444 !important;
+        --message-success-bg: #f0fdf4 !important;
+        --message-warning-bg: #fffbeb !important;
+        --message-error-bg: #fef2f2 !important;
+        --darkened-bg: #f1f5f9 !important;
+        --selected-bg: #e0e7ff !important;
+        --selected-row: #e0e7ff !important;
+        --button-fg: #fff !important;
+        --button-bg: #4f46e5 !important;
+        --button-hover-bg: #4338ca !important;
+        --default-button-bg: #4f46e5 !important;
+        --default-button-hover-bg: #4338ca !important;
+        --close-button-bg: #64748b !important;
+        --close-button-hover-bg: #475569 !important;
+        --delete-button-bg: #ef4444 !important;
+        --delete-button-hover-bg: #dc2626 !important;
+        --object-tools-fg: #fff !important;
+        --object-tools-bg: #4f46e5 !important;
+        --object-tools-hover-bg: #4338ca !important;
+    }
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+}
+#content {
+    padding: 20px !important;
+}
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], input[type=tel], textarea, select, .vTextField {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    box-shadow: none !important;
+    color: #1e293b !important;
+    background: #ffffff !important;
+}
+input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
+    border-color: #4f46e5 !important;
+    outline: none !important;
+}
+.submit-row {
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 15px 20px !important;
+}
+.submit-row input {
+    border-radius: 6px !important;
+    padding: 10px 20px !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+}
+fieldset.module {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    background: #ffffff !important;
+    margin-bottom: 20px !important;
+}
+fieldset.module h2 {
+    background: #f8fafc !important;
+    color: #1e293b !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 12px 15px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+.form-row {
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 15px !important;
+}
+.form-row:last-child {
+    border-bottom: none !important;
+}
+label {
+    color: #475569 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+}
+.required label:after {
+    content: " *" !important;
+    color: #ef4444 !important;
+}
+.vDateField, .vTimeField {
+    max-width: 150px !important;
+}
+.related-widget-wrapper-link img {
+    filter: invert(40%) sepia(90%) saturate(1000%) hue-rotate(210deg) brightness(95%) contrast(100%) !important;
+}
+.view-related {
+    display: none !important;
+}
