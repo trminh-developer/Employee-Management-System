@@ -1,200 +1,86 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Employee Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .login-split {
-            display: flex;
-            width: 100%;
-        }
-        .login-left {
-            flex: 1;
-            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-500) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            padding: 4rem;
-            position: relative;
-            overflow: hidden;
-        }
-        .login-left::before {
-            content: '';
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            top: -25%;
-            left: -25%;
-        }
-        .login-brand {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-        .login-brand h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: -1px;
-        }
-        .login-brand p {
-            font-size: 1.125rem;
-            opacity: 0.9;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .login-right {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--bg-surface);
-        }
-        .login-form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 2rem;
-        }
-        .login-header {
-            margin-bottom: 2rem;
-        }
-        .login-header h2 {
-            font-size: 1.75rem;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        .login-header p {
-            color: var(--text-secondary);
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background-color: var(--bg-body);
-            color: var(--text-primary);
-            font-family: inherit;
-            transition: all var(--transition-fast);
-            box-sizing: border-box;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-500);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .btn-login {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: var(--primary-600);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 500;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color var(--transition-fast);
-        }
-        .btn-login:hover {
-            background-color: var(--primary-700);
-        }
-        .error-message {
-            background-color: var(--danger-50);
-            color: var(--danger-700);
-            padding: 0.75rem;
-            border-radius: var(--radius-md);
-            font-size: 0.875rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--danger-100);
-        }
-        @media (max-width: 768px) {
-            .login-left {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<div class="login-split">
-    <div class="login-left">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/components.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+  </head>
+  <body>
+    <div class="login-split">
+      <div class="login-left">
         <div class="login-brand">
-            <h1>EMS Platform</h1>
-            <p>Employee Intelligence & Data-driven HR Management System.</p>
+          <h1>EMS Platform</h1>
+          <p>Employee Intelligence & Data-driven HR Management System.</p>
         </div>
-    </div>
-    
-    <div class="login-right">
+      </div>
+
+      <div class="login-right">
         <div class="login-form-container">
-            <div class="login-header">
-                <h2>Welcome back</h2>
-                <p>Please enter your details to sign in.</p>
+          <div class="login-header">
+            <h2>Welcome back</h2>
+            <p>Please enter your details to sign in.</p>
+          </div>
+
+          {% if form.errors %}
+          <div class="error-message">
+            Invalid username or password. Please try again.
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label for="id_username" class="form-label">Username</label>
+              <input
+                type="text"
+                name="username"
+                id="id_username"
+                class="form-control"
+                placeholder="Enter your username"
+                required
+                autofocus
+              />
             </div>
-            
-            {% if form.errors %}
-                <div class="error-message">
-                    Invalid username or password. Please try again.
-                </div>
-            {% endif %}
 
-            <form method="post" action="{% url 'accounts:login' %}">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="id_username" class="form-label">Username</label>
-                    <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" required autofocus>
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_password" class="form-label">Password</label>
-                    <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
-                </div>
-                
-                <div class="form-check">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember" style="font-size: 0.875rem; color: var(--text-secondary);">Remember me</label>
-                </div>
-                
-                <button type="submit" class="btn-login">Sign In</button>
-            </form>
+            <div class="form-group">
+              <label for="id_password" class="form-label">Password</label>
+              <input
+                type="password"
+                name="password"
+                id="id_password"
+                class="form-control"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <div class="form-check">
+              <input type="checkbox" id="remember" name="remember" />
+              <label
+                for="remember"
+                style="font-size: 0.875rem; color: var(--text-secondary)"
+                >Remember me</label
+              >
+            </div>
+
+            <button type="submit" class="btn-login">Sign In</button>
+          </form>
         </div>
+      </div>
     </div>
-</div>
 
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-    lucide.createIcons();
-</script>
-</body>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>
