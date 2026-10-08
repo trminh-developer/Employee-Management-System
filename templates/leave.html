@@ -1,116 +1,52 @@
 {% extends 'base.html' %}
-{% load static %}
+{% block title %}Đơn xin nghỉ phép - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h2>Leave Management</h2>
-    <div class="header-actions">
-        <button class="btn btn-primary" onclick="document.getElementById('leaveModal').style.display='block'">Request Leave</button>
+<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Đơn xin nghỉ phép</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Quản lý đơn xin nghỉ phép của nhân viên.</p>
     </div>
+    <button type="button" id="addNew" class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px;" onclick="openCrudModal('/admin/leave/leaverequest/add/?_popup=1', 'Tạo đơn mới'); return false;">Tạo đơn mới</button>
 </div>
 
-<div class="kpi-container">
-    <div class="kpi-card">
-        <div class="kpi-title">Pending Requests</div>
-        <div class="kpi-value">12</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-title">Approved This Month</div>
-        <div class="kpi-value text-success">45</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-title">Employees on Leave</div>
-        <div class="kpi-value">7</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h3>Leave Requests</h3>
-    </div>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Leave Type</th>
-                    <th>From Date</th>
-                    <th>To Date</th>
-                    <th>Duration (Days)</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Annual Leave</td>
-                    <td>2023-11-20</td>
-                    <td>2023-11-24</td>
-                    <td>5</td>
-                    <td><span class="badge badge-warning">Pending</span></td>
-                    <td>
-                        <button class="btn btn-success btn-sm">Approve</button>
-                        <button class="btn btn-danger btn-sm">Reject</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Jane Smith</td>
-                    <td>Sick Leave</td>
-                    <td>2023-11-15</td>
-                    <td>2023-11-16</td>
-                    <td>2</td>
-                    <td><span class="badge badge-success">Approved</span></td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" disabled>Processed</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Mike Johnson</td>
-                    <td>Unpaid Leave</td>
-                    <td>2023-12-01</td>
-                    <td>2023-12-10</td>
-                    <td>10</td>
-                    <td><span class="badge badge-danger">Rejected</span></td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" disabled>Processed</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal -->
-<div id="leaveModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-    <div class="modal-content" style="background:#fff; width:400px; margin:10% auto; padding:20px; border-radius:8px;">
-        <h3>Request Leave</h3>
-        <form>
-            <div class="form-group" style="margin-bottom:15px;">
-                <label>Leave Type</label>
-                <select class="form-control" style="width:100%; padding:8px; margin-top:5px; border: 1px solid #ccc; border-radius: 4px;">
-                    <option>Annual Leave</option>
-                    <option>Sick Leave</option>
-                    <option>Unpaid Leave</option>
-                </select>
-            </div>
-            <div class="form-group" style="margin-bottom:15px;">
-                <label>From Date</label>
-                <input type="date" class="form-control" style="width:100%; padding:8px; margin-top:5px; border: 1px solid #ccc; border-radius: 4px;">
-            </div>
-            <div class="form-group" style="margin-bottom:15px;">
-                <label>To Date</label>
-                <input type="date" class="form-control" style="width:100%; padding:8px; margin-top:5px; border: 1px solid #ccc; border-radius: 4px;">
-            </div>
-            <div class="form-group" style="margin-bottom:15px;">
-                <label>Reason</label>
-                <textarea class="form-control" style="width:100%; padding:8px; margin-top:5px; height:80px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-            </div>
-            <div class="form-actions" style="text-align:right;">
-                <button type="button" class="btn btn-secondary" onclick="document.getElementById('leaveModal').style.display='none'">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit Request</button>
-            </div>
-        </form>
-    </div>
+<div class="table-container" style="background: var(--bg-surface); border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto;">
+    <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: var(--bg-surface-alt); text-transform: uppercase; font-size: 12px; color: var(--text-secondary);">
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Nhân viên</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Loại nghỉ</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thời gian</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Số ngày</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Trạng thái</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                <td style="padding: 16px 20px; color: var(--text-primary);"><strong>{{ req.employee.user.get_full_name }}</strong><br><small style="color:var(--text-secondary)">{{ req.employee.department.name }}</small></td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ req.get_leave_type_display }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ req.start_date|date:"d/m/Y" }} - {{ req.end_date|date:"d/m/Y" }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ req.duration_days }}</td>
+                <td style="padding: 16px 20px;">
+                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
+                    {% if req.status == 'approved' %}background:#c6f6d5;color:#22543d;
+                    {% elif req.status == 'rejected' %}background:#fed7d7;color:#9b2c2c;
+                    {% else %}background:#e2e8f0;color:#4a5568;{% endif %}">
+                        {{ req.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 16px 20px;">
+                    <a href="{% url 'admin:leave_leaverequest_change' req.id %}?next={{ request.path }}" style="color: var(--primary-500); text-decoration: none; font-weight: 600; margin-right: 10px;">Duyệt đơn</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center; padding: 30px; color: var(--text-secondary);">Chưa có đơn xin nghỉ phép nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
