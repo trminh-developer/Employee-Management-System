@@ -1,117 +1,263 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Employees - Employee Management{% endblock %}
+{% block title %}Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Employees</h1>
-</div>
+<style>
+/* Toolbar Styling */
+.employee-workspace .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: var(--bg-surface);
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.employee-workspace .search-box, 
+.employee-workspace .filters, 
+.employee-workspace .view-toggle {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.employee-workspace .form-input, 
+.employee-workspace .form-select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.employee-workspace .form-input:focus, 
+.employee-workspace .form-select:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+}
+
+.employee-workspace .btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.employee-workspace .btn-primary {
+    background: var(--primary-500);
+    color: white;
+}
+.employee-workspace .btn-primary:hover {
+    background: var(--primary-600);
+}
+
+.employee-workspace .btn-secondary {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+.employee-workspace .btn-secondary:hover {
+    background: var(--bg-surface-alt);
+}
+
+@media (max-width: 768px) {
+    .employee-workspace .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .employee-workspace .search-box {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+    }
+    .employee-workspace .search-box input {
+        flex: 1;
+    }
+    .employee-workspace .filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .employee-workspace .filters select,
+    .employee-workspace .filters button,
+    .employee-workspace .filters a {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    .employee-workspace .filters a#addNew {
+        grid-column: span 2;
+        text-align: center;
+    }
+}
+
+/* Table Styling */
+.table-container {
+    background: var(--bg-surface);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+.data-table th {
+    background-color: var(--bg-surface-alt);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-surface-alt);
+}
+
+/* UI Elements */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-100);
+    color: var(--primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.badge-success { background: #c6f6d5; color: #22543d; }
+.badge-warning { background: #feebc8; color: #7b341e; }
+
+.btn-action {
+    color: var(--primary-500);
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: 600;
+    font-size: 14px;
+}
+.btn-action:hover { color: var(--primary-600); text-decoration: underline; }
+</style>
 
 <div class="employee-workspace">
-    <div class="toolbar">
+    <form method="GET" class="toolbar">
         <div class="search-box">
-            <input type="text" placeholder="Search employees..." class="form-input">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Tìm kiếm nhân viên..." class="form-input">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
         </div>
         <div class="filters">
-            <select class="form-select">
-                <option value="">All Departments</option>
-                <option value="engineering">Engineering</option>
-                <option value="sales">Sales</option>
-                <option value="marketing">Marketing</option>
+            <select name="department" class="form-select">
+                <option value="">Tất cả phòng ban</option>
+                {% for d in departments %}
+                <option value="{{ d.id }}" {% if request.GET.department == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                {% endfor %}
             </select>
-            <select class="form-select">
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="on_leave">On Leave</option>
+            <select name="status" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Đang làm việc</option>
+                <option value="on_leave" {% if request.GET.status == 'on_leave' %}selected{% endif %}>Nghỉ phép</option>
+                <option value="remote" {% if request.GET.status == 'remote' %}selected{% endif %}>Làm từ xa</option>
+                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Đã nghỉ việc</option>
             </select>
+            <button type="submit" class="btn btn-secondary">Lọc</button>
+            {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+            <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/employees/employee/add/?_popup=1', 'Thêm Nhân viên mới'); return false;">+ Thêm mới</button>
+            {% endif %}
         </div>
-        <div class="view-toggle">
-            <button class="btn btn-secondary">Grid</button>
-            <button class="btn btn-primary">Table</button>
-        </div>
-    </div>
+    </form>
 
     <div class="table-container">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Avatar</th>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Position</th>
-                    <th>Status</th>
-                    <th>Performance</th>
-                    <th>Actions</th>
+                    <th>Ảnh</th>
+                    <th>Họ Tên</th>
+                    <th>Phòng ban</th>
+                    <th>Chức vụ</th>
+                    <th>Trạng thái</th>
+                    <th>Đánh giá</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
+                {% for emp in employees %}
                 <tr>
-                    <td><div class="avatar">JD</div></td>
-                    <td>EMP001</td>
-                    <td>John Doe</td>
-                    <td>Engineering</td>
-                    <td>Senior Developer</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                    <td>Excellent</td>
                     <td>
-                        <a href="#" class="btn-action">View</a>
-                        <a href="#" class="btn-action">Edit</a>
+                        <div class="avatar" style="overflow: hidden;">
+                            {% if emp.avatar %}
+                                <img src="{{ emp.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                            {% else %}
+                                {{ emp.user.first_name|slice:":1" }}{{ emp.user.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ emp.user.get_full_name }}</strong><br>
+                        <small style="color:var(--text-secondary)">{{ emp.employee_id }}</small>
+                    </td>
+                    <td>{{ emp.department.name|default:"-" }}</td>
+                    <td>{{ emp.position.title|default:"-" }}</td>
+                    <td>
+                        <span class="badge {% if emp.status == 'active' %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ emp.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap: 2px;">
+                            <span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#e2e8f0">★</span>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'employees:profile' emp.id %}" class="btn-action">Xem</a>
+                        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+                        <a href="#" onclick="openCrudModal('/admin/employees/employee/{{ emp.id }}/change/?_popup=1', 'Sửa Nhân viên'); return false;" class="btn-action">Sửa</a>
+                        <a href="#" onclick="openCrudModal('/admin/employees/employee/{{ emp.id }}/delete/?_popup=1', 'Xóa Nhân viên'); return false;" class="btn-action" style="color: var(--danger-red); border-color: #fca5a5; background: #fef2f2;">Xóa</a>
+                        {% endif %}
                     </td>
                 </tr>
+                {% empty %}
                 <tr>
-                    <td><div class="avatar">JS</div></td>
-                    <td>EMP002</td>
-                    <td>Jane Smith</td>
-                    <td>Marketing</td>
-                    <td>Manager</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                    <td>Good</td>
-                    <td>
-                        <a href="#" class="btn-action">View</a>
-                        <a href="#" class="btn-action">Edit</a>
+                    <td colspan="7" style="text-align:center; padding: 30px; color: var(--text-secondary);">
+                        Không tìm thấy nhân viên nào.
                     </td>
                 </tr>
-                <tr>
-                    <td><div class="avatar">MB</div></td>
-                    <td>EMP003</td>
-                    <td>Michael Brown</td>
-                    <td>Sales</td>
-                    <td>Executive</td>
-                    <td><span class="badge badge-warning">On Leave</span></td>
-                    <td>Average</td>
-                    <td>
-                        <a href="#" class="btn-action">View</a>
-                        <a href="#" class="btn-action">Edit</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><div class="avatar">EJ</div></td>
-                    <td>EMP004</td>
-                    <td>Emily Johnson</td>
-                    <td>HR</td>
-                    <td>Specialist</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                    <td>Excellent</td>
-                    <td>
-                        <a href="#" class="btn-action">View</a>
-                        <a href="#" class="btn-action">Edit</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><div class="avatar">DW</div></td>
-                    <td>EMP005</td>
-                    <td>David Wilson</td>
-                    <td>Engineering</td>
-                    <td>QA Engineer</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                    <td>Good</td>
-                    <td>
-                        <a href="#" class="btn-action">View</a>
-                        <a href="#" class="btn-action">Edit</a>
-                    </td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

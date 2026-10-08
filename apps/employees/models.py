@@ -12,8 +12,8 @@ class Employee(models.Model):
     
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_profile')
     employee_id = models.CharField(max_length=20, unique=True)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='employees')
-    position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, related_name='employees')
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
+    position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
     manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
     
     # Personal Info

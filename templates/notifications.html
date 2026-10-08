@@ -1,14 +1,58 @@
 {% extends 'base.html' %}
-{% block title %}Notifications - Employee Management{% endblock %}
+{% block title %}Thông báo - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Notifications</h1>
-    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Manage Notifications operations.</p>
+<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Thông báo</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Xem các cảnh báo và tin nhắn hệ thống.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+        <button class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px; cursor: pointer;" onclick="openCrudModal('/admin/notifications/notification/add/?_popup=1', 'Thêm Thông báo mới'); return false;">+ Tạo thông báo</button>
+        {% endif %}
+        <button class="btn btn-secondary" style="padding: 10px 20px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer;">Đánh dấu đã đọc tất cả</button>
+    </div>
 </div>
-<div style="padding: 2rem; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
-    <i data-lucide="layout-grid" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
-    <h2>Module In Development</h2>
-    <p>This module is part of the architectural scaffolding and will be expanded shortly.</p>
+
+<div class="table-container" style="background: var(--bg-surface); border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto;">
+    <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: var(--bg-surface-alt); text-transform: uppercase; font-size: 12px; color: var(--text-secondary);">
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thời gian</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Mức độ</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Phân loại</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Nội dung</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for n in notifs %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; background: {% if not n.is_read %}var(--primary-50){% else %}transparent{% endif %};">
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ n.created_at|date:"d/m/Y H:i" }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">
+                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
+                    {% if n.priority == 'critical' %}background:#fed7d7;color:#9b2c2c;
+                    {% elif n.priority == 'high' %}background:#feebc8;color:#7b341e;
+                    {% else %}background:#e2e8f0;color:#4a5568;{% endif %}">
+                        {{ n.get_priority_display }}
+                    </span>
+                </td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">{{ n.category|title }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">
+                    <strong>{{ n.title }}</strong><br>
+                    <span style="color: var(--text-secondary); font-size: 13px;">{{ n.message }}</span>
+                </td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">
+                    {% if n.is_read %}<span style="color:var(--text-secondary);">Đã đọc</span>{% else %}<strong>Mới</strong>{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; padding: 30px; color: var(--text-secondary);">Không có thông báo nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

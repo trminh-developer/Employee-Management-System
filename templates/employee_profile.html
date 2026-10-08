@@ -1,94 +1,103 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Employee Profile - Employee Management{% endblock %}
+{% block title %}Hồ sơ nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="profile-header">
-    <div class="profile-avatar-large">JD</div>
-    <div class="profile-title">
-        <h1>John Doe</h1>
-        <p class="job-title">Senior Developer</p>
-        <p class="department">Engineering</p>
+<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Chi tiết nhân viên</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Hồ sơ thông tin nhân viên trong công ty.</p>
+    </div>
+    {% if '_popup' not in request.GET %}
+    <a href="{% url 'admin:employees_employee_change' employee.id %}?next={{ request.path }}" class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px; text-decoration: none;">
+        <i data-lucide="edit"></i> Chỉnh sửa
+    </a>
+    {% endif %}
+</div>
+
+<div class="profile-header" style="display: flex; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+    <div class="profile-avatar-large" style="display:flex; align-items:center; justify-content:center; width:80px; height:80px; background:var(--primary-100); color:var(--primary-700); border-radius:50%; font-size:24px; font-weight:bold; overflow: hidden;">
+        {% if employee.avatar %}
+            <img src="{{ employee.avatar.url }}" style="width:100%; height:100%; border-radius:50%; object-fit: cover;" />
+        {% else %}
+            {{ employee.user.first_name|first|default:"U" }}{{ employee.user.last_name|first|default:"U" }}
+        {% endif %}
+    </div>
+    <div class="profile-title" style="margin-left: 20px;">
+        <h1 style="margin: 0; font-size: 24px; color: var(--text-primary);">{{ employee.user.get_full_name|default:employee.user.username }}</h1>
+        <p class="job-title" style="margin: 5px 0; color: var(--text-secondary); font-weight: 500;">{{ employee.position.title|default:"Chưa cập nhật chức vụ" }}</p>
+        <p class="department" style="margin: 0; color: var(--text-muted);">{{ employee.department.name|default:"Chưa phân bổ phòng ban" }}</p>
     </div>
 </div>
 
-<div class="profile-tabs">
-    <nav class="tabs-nav">
-        <a href="#personal" class="tab-link active">Personal</a>
-        <a href="#employment" class="tab-link">Employment</a>
-        <a href="#attendance" class="tab-link">Attendance</a>
-        <a href="#performance" class="tab-link">Performance</a>
+<div class="profile-tabs" style="margin-top: 20px; border-bottom: 1px solid var(--border-color);">
+    <nav class="tabs-nav" style="display: flex; gap: 20px;">
+        <a href="#personal" class="tab-link active" style="padding: 10px 0; text-decoration: none; color: var(--primary-500); border-bottom: 2px solid var(--primary-500); font-weight: 600;">Cá nhân</a>
+        <a href="#work" class="tab-link" style="padding: 10px 0; text-decoration: none; color: var(--text-secondary); font-weight: 500;">Công việc</a>
+        <a href="#attendance" class="tab-link" style="padding: 10px 0; text-decoration: none; color: var(--text-secondary); font-weight: 500;">Nghỉ phép</a>
     </nav>
 </div>
 
-<div class="profile-content">
-    <div id="personal" class="tab-pane active">
-        <div class="grid-layout">
+<div class="profile-content" style="margin-top: 20px;">
+    <!-- Personal Tab -->
+    <div id="personal" class="tab-pane active" style="display: block;">
+        <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
             <div class="info-group">
-                <label>Email</label>
-                <p>john.doe@example.com</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Thư điện tử</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.user.email|default:"Chưa cập nhật" }}</p>
             </div>
             <div class="info-group">
-                <label>Phone</label>
-                <p>+1 234 567 8900</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Điện thoại</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.phone|default:"Chưa cập nhật" }}</p>
             </div>
             <div class="info-group">
-                <label>Date of Birth</label>
-                <p>January 15, 1990</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Ngày sinh</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.dob|date:"d/m/Y"|default:"Chưa cập nhật" }}</p>
             </div>
             <div class="info-group">
-                <label>Address</label>
-                <p>123 Main St, City, Country</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Địa chỉ</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.address|default:"Chưa cập nhật" }}</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Giới tính</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.get_gender_display|default:"Chưa cập nhật" }}</p>
             </div>
         </div>
     </div>
     
-    <div id="employment" class="tab-pane" style="display: none;">
-        <div class="grid-layout">
+    <!-- Work Tab -->
+    <div id="work" class="tab-pane" style="display: none;">
+        <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
             <div class="info-group">
-                <label>Hire Date</label>
-                <p>March 1, 2020</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Ngày vào làm</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.join_date|date:"d/m/Y"|default:"Chưa cập nhật" }}</p>
             </div>
             <div class="info-group">
-                <label>Manager</label>
-                <p>Sarah Connor</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Quản lý trực tiếp</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.manager.user.get_full_name|default:"Không có" }}</p>
             </div>
             <div class="info-group">
-                <label>Employment Type</label>
-                <p>Full-Time</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Mã Nhân Viên</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.employee_id }}</p>
             </div>
             <div class="info-group">
-                <label>Work Location</label>
-                <p>New York Office</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Trạng thái</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.get_status_display }}</p>
             </div>
         </div>
     </div>
 
+    <!-- Attendance/Leave Tab -->
     <div id="attendance" class="tab-pane" style="display: none;">
-        <h3>Leave Balance</h3>
-        <div class="grid-layout">
+        <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
             <div class="info-group">
-                <label>Annual Leave</label>
-                <p>12 Days Available</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Phép năm còn lại</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">12 Ngày</p>
             </div>
             <div class="info-group">
-                <label>Sick Leave</label>
-                <p>5 Days Available</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="performance" class="tab-pane" style="display: none;">
-        <h3>Latest Reviews</h3>
-        <div class="grid-layout">
-            <div class="info-group">
-                <label>2023 Annual Review</label>
-                <p>Rating: Exceeds Expectations</p>
-            </div>
-            <div class="info-group">
-                <label>Q1 2024 Check-in</label>
-                <p>On track with goals</p>
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Phép bệnh còn lại</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">5 Ngày</p>
             </div>
         </div>
     </div>
@@ -105,15 +114,22 @@
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Remove active class from all links and panes
-                tabLinks.forEach(l => l.classList.remove('active'));
+                // Remove active classes
+                tabLinks.forEach(l => {
+                    l.classList.remove('active');
+                    l.style.color = 'var(--text-secondary)';
+                    l.style.borderBottom = 'none';
+                });
+                
                 tabPanes.forEach(p => {
                     p.classList.remove('active');
                     p.style.display = 'none';
                 });
 
-                // Add active class to clicked link
+                // Add active to clicked
                 this.classList.add('active');
+                this.style.color = 'var(--primary-500)';
+                this.style.borderBottom = '2px solid var(--primary-500)';
 
                 // Show corresponding pane
                 const targetId = this.getAttribute('href').substring(1);

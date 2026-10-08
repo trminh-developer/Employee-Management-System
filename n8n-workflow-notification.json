@@ -1,0 +1,54 @@
+{
+  "name": "HR System - Email Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-notification",
+        "options": {}
+      },
+      "id": "4be0172e-0a56-4b2a-a9e9-123456789abc",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "send-notification"
+    },
+    {
+      "parameters": {
+        "fromEmail": "hr@yourcompany.com",
+        "toEmail": "={{ $json.body.user_email }}",
+        "subject": "=[Hệ Thống HR] {{ $json.body.title }}",
+        "text": "=Xin chào {{ $json.body.user_name }},\n\nBạn có một thông báo mới từ hệ thống nhân sự:\n\nTiêu đề: {{ $json.body.title }}\nMức độ: {{ $json.body.priority }}\nNội dung: {{ $json.body.message }}\n\nVui lòng đăng nhập vào hệ thống để xem chi tiết.\n\nTrân trọng,\nPhòng Nhân sự",
+        "options": {}
+      },
+      "id": "e81d11ff-1234-4567-89ab-cdef01234567",
+      "name": "Send Email (SMTP)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email (SMTP)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}

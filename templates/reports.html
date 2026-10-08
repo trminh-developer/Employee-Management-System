@@ -1,14 +1,70 @@
 {% extends 'base.html' %}
-{% block title %}Reports - Employee Management{% endblock %}
+{% block title %}Báo cáo & Phân tích - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Reports</h1>
-    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Manage Reports operations.</p>
+<div class="page-header" style="margin-bottom: 30px;">
+    <h1>Báo cáo & Phân tích</h1>
+    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Cái nhìn tổng quan về tình hình nhân sự và tài chính của doanh nghiệp.</p>
 </div>
-<div style="padding: 2rem; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
-    <i data-lucide="layout-grid" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
-    <h2>Module In Development</h2>
-    <p>This module is part of the architectural scaffolding and will be expanded shortly.</p>
+
+<div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <!-- Chart 1: Headcount -->
+    <div style="background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--text-primary);">Phân bổ Nhân sự theo Phòng ban</h3>
+        <canvas id="deptChart" height="250"></canvas>
+    </div>
+
+    <!-- Chart 2: Payroll Cost -->
+    <div style="background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--text-primary);">Chi phí Lương theo Phòng ban (Đã thanh toán)</h3>
+        <canvas id="salaryChart" height="250"></canvas>
+    </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart 1
+    const ctx1 = document.getElementById('deptChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'pie',
+        data: {
+            labels: {{ dept_labels|safe }},
+            datasets: [{
+                data: {{ dept_counts|safe }},
+                backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Chart 2
+    const ctx2 = document.getElementById('salaryChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ salary_labels|safe }},
+            datasets: [{
+                label: 'Chi phí (VNĐ)',
+                data: {{ salary_costs|safe }},
+                backgroundColor: '#4f46e5',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
