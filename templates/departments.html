@@ -29,6 +29,7 @@
                 <td style="padding: 16px 20px; color: var(--text-primary);">{{ dept.parent.name|default:"-" }}</td>
                 <td style="padding: 16px 20px; color: var(--text-primary);">${{ dept.budget }}</td>
                 <td style="padding: 16px 20px;">
+                    <a href="{% url 'employees:list' %}?department={{ dept.id }}" style="color: var(--success-green); text-decoration: none; font-weight: 600; margin-right: 10px;">Nhân sự</a>
                     <a href="#" onclick="openCrudModal('/admin/departments/department/{{ dept.id }}/change/?_popup=1', 'Sửa phòng ban'); return false;" style="color: var(--primary-500); text-decoration: none; font-weight: 600; margin-right: 10px;">Sửa</a>
                     <a href="#" onclick="openCrudModal('/admin/departments/department/{{ dept.id }}/delete/?_popup=1', 'Xóa phòng ban'); return false;" style="color: var(--danger-red); text-decoration: none; font-weight: 600;">Xóa</a>
                 </td>

@@ -114,3 +114,20 @@ def my_profile(request):
         return redirect('employees:my_profile')
         
     return render(request, 'my_profile.html', {'employee': employee, 'user': user})
+from django.http import JsonResponse
+
+def api_employees(request):
+    employees = Employee.objects.select_related('user', 'department', 'position').all()[:50]
+    data = []
+    for emp in employees:
+        data.append({
+            'id': emp.id,
+            'employee_id': emp.employee_id,
+            'full_name': emp.user.get_full_name() if emp.user else '',
+            'email': emp.user.email if emp.user else '',
+            'department': emp.department.name if emp.department else '',
+            'position': emp.position.title if emp.position else '',
+            'phone': emp.phone,
+            'status': emp.status
+        })
+    return JsonResponse({'status': 'success', 'count': len(data), 'data': data})

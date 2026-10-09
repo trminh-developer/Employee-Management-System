@@ -45,11 +45,23 @@
         <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
             <div class="info-group">
                 <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Thư điện tử</label>
-                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.user.email|default:"Chưa cập nhật" }}</p>
+                <p style="margin-top: 5px;">
+                    {% if employee.user.email %}
+                        <a href="mailto:{{ employee.user.email }}" style="color: var(--primary-500); text-decoration: none;">{{ employee.user.email }}</a>
+                    {% else %}
+                        <span style="color: var(--text-primary);">Chưa cập nhật</span>
+                    {% endif %}
+                </p>
             </div>
             <div class="info-group">
                 <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Điện thoại</label>
-                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.phone|default:"Chưa cập nhật" }}</p>
+                <p style="margin-top: 5px;">
+                    {% if employee.phone %}
+                        <a href="tel:{{ employee.phone }}" style="color: var(--primary-500); text-decoration: none;">{{ employee.phone }}</a>
+                    {% else %}
+                        <span style="color: var(--text-primary);">Chưa cập nhật</span>
+                    {% endif %}
+                </p>
             </div>
             <div class="info-group">
                 <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Ngày sinh</label>
