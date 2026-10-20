@@ -4,13 +4,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đăng nhập - Hệ Thống Quản Lý Nhân Sự (EMS)</title>
+    <title>Đăng nhập - TMNexora (Employee Management System)</title>
     <meta name="description" content="Cổng đăng nhập Hệ Thống Quản Lý Nhân Sự (EMS Platform) - Quản trị hồ sơ nhân viên, chấm công, nghỉ phép, bảng lương và đánh giá KPI doanh nghiệp." />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'images/favicon-128.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />
-    <meta property="og:title" content="Đăng nhập - Hệ Thống Quản Lý Nhân Sự (EMS)" />
+    <meta property="og:title" content="Đăng nhập - TMNexora (Employee Management System)" />
     <meta property="og:description" content="Cổng đăng nhập Hệ Thống Quản Lý Nhân Sự (EMS Platform) dành cho doanh nghiệp." />
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
     <meta name="twitter:card" content="summary" />
@@ -40,15 +43,22 @@
   <body>
     <div class="login-split">
       <div class="login-left">
-        <div class="login-brand">
-          <h1>EMS Platform</h1>
-          <p>Employee Intelligence & Data-driven HR Management System.</p>
+        <div class="login-brand" style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+          <div style="background: white; border-radius: 20px; padding: 22px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.18); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+            <img src="{% static 'images/logo.png' %}" alt="TMNexora Logo" style="max-width: 210px; width: 100%; height: auto;">
+          </div>
+          <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px;">TMNexora</h1>
+          <p style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.9); max-width: 360px; margin: 0 auto; line-height: 1.5;">Employee Management System - Nền tảng quản trị nhân sự hiện đại, thông minh & chuẩn mực.</p>
         </div>
       </div>
 
       <div class="login-right">
         <div class="login-form-container">
           <div class="login-header">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+              <img src="{% static 'images/logo-icon.png' %}" alt="TMNexora" style="width: 30px; height: 30px; object-fit: contain;">
+              <span style="font-weight: 800; font-size: 1.15rem; color: var(--text-primary); letter-spacing: -0.02em;">TMNexora</span>
+            </div>
             <h2>Welcome back</h2>
             <p>Please enter your details to sign in.</p>
           </div>

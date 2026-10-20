@@ -4,17 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Hệ Thống Quản Lý Nhân Sự (EMS){% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Hệ Thống Quản Lý Nhân Sự (EMS) - Giải pháp quản trị hồ sơ nhân viên, phòng ban, chấm công, nghỉ phép, bảng lương và đánh giá hiệu suất KPI doanh nghiệp.{% endblock %}">
+    <title>{% block title %}TMNexora - Hệ Thống Quản Lý Nhân Sự{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}TMNexora - Hệ Thống Quản Lý Nhân Sự (Employee Management System) thông minh, hồ sơ nhân viên, phòng ban, chấm công, nghỉ phép, bảng lương và đánh giá hiệu suất KPI.{% endblock %}">
     <meta name="robots" content="{% block meta_robots %}noindex, nofollow{% endblock %}">
     <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2'><rect x='4' y='2' width='16' height='20' rx='2'/><path d='M9 22v-4h6v4'/></svg>">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'images/favicon-128.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
 
     <!-- Open Graph / Social Metadata -->
     <meta property="og:type" content="website">
     <meta property="og:locale" content="vi_VN">
-    <meta property="og:site_name" content="HR Portal - EMS">
-    <meta property="og:title" content="{% block og_title %}Hệ Thống Quản Lý Nhân Sự (EMS){% endblock %}">
+    <meta property="og:site_name" content="TMNexora - Employee Management System">
+    <meta property="og:title" content="{% block og_title %}TMNexora - Hệ Thống Quản Lý Nhân Sự{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Nền tảng quản trị nhân sự, chấm công, bảng lương và đánh giá KPI tập trung.{% endblock %}">
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
     <meta name="twitter:card" content="summary">
@@ -58,11 +60,11 @@
         {% if '_popup' not in request.GET %}
         <aside id="sidebar" class="sidebar" aria-label="Điều hướng chính">
             <div class="sidebar-header">
-                <a href="{% url 'dashboard' %}" class="sidebar-brand">
-                    <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--primary-600), #0d9488); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: var(--shadow-sm); flex-shrink: 0;">E</div>
+                <a href="{% url 'dashboard' %}" class="sidebar-brand" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    <img src="{% static 'images/logo-icon.png' %}" alt="TMNexora Logo" style="width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; border-radius: 8px;">
                     <div style="display: flex; flex-direction: column; line-height: 1.15;">
-                        <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; color: var(--text-primary);">EMS Platform</span>
-                        <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 500;">Quản Trị Nhân Sự</span>
+                        <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; color: var(--text-primary);">TMNexora</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;">Employee System</span>
                     </div>
                 </a>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Đóng/Mở thanh bên">

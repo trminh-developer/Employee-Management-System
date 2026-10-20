@@ -5,3 +5,12 @@
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/admin_theme.css' %}">
 {% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none;">
+        <img src="{% static 'images/logo-icon.png' %}" alt="TMNexora" style="width: 26px; height: 26px; object-fit: contain;">
+        <span style="font-weight: 700; letter-spacing: -0.01em;">TMNexora Administration</span>
+    </a>
+</h1>
+{% endblock %}
