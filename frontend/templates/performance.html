@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Đánh giá hiệu suất (KPI) - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Theo dõi và quản lý kết quả đánh giá hiệu suất làm việc (KPI) định kỳ của nhân viên trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
+{% block og_title %}Đánh giá hiệu suất (KPI) - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <style>
@@ -148,7 +150,7 @@
     height: 40px;
     border-radius: 50%;
     background: var(--primary-100);
-    color: var(--primary-700);
+    color: var(--primary-500);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -162,21 +164,25 @@
     font-size: 12px;
     font-weight: 600;
 }
-.badge-success { background: #c6f6d5; color: #22543d; }
-.badge-warning { background: #feebc8; color: #7b341e; }
 
-.btn-action {
-    color: var(--primary-500);
-    text-decoration: none;
-    margin-right: 15px;
-    font-weight: 600;
-    font-size: 14px;
-}
-.btn-action:hover { color: var(--primary-600); text-decoration: underline; }
+
+
+
 </style>
 
 <div class="employee-workspace">
+    <div class="page-header" style="margin-bottom: 20px;">
+        <h1>Đánh giá hiệu suất (KPI)</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Theo dõi kết quả đánh giá năng lực và KPI định kỳ của nhân sự.</p>
+    </div>
+    {% if selected_employee %}
+    <div style="margin-bottom: 15px; padding: 10px 15px; background: var(--bg-surface); border: 1px solid var(--primary-500); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
+        <span style="color: var(--primary-500); font-weight: 500;">Đang xem đánh giá của nhân viên: <strong>{{ selected_employee.user.get_full_name }}</strong></span>
+        <a href="{% url 'performance:list' %}" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;">Xóa bộ lọc</a>
+    </div>
+    {% endif %}
     <form method="GET" class="toolbar">
+        {% if request.GET.employee %}<input type="hidden" name="employee" value="{{ request.GET.employee }}">{% endif %}
         <div class="search-box">
             <input type="text" name="q" value="{{ search_query }}" placeholder="Tìm kiếm theo tên hoặc kỳ đánh giá..." class="form-input">
             <button type="submit" class="btn btn-primary">Tìm kiếm</button>
@@ -219,6 +225,7 @@
                     <td>
                         {% if request.user.role in 'admin,hr,manager' %}
                         <a href="#" onclick="openCrudModal('/admin/performance/performancereview/{{ rev.id }}/change/?_popup=1', 'Sửa Đánh giá'); return false;" class="btn-action">Sửa</a>
+                        <a href="#" onclick="openCrudModal('/admin/performance/performancereview/{{ rev.id }}/delete/?_popup=1', 'Xóa Đánh giá'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -234,3 +241,9 @@
     </div>
 </div>
 {% endblock %}
+
+
+
+
+
+

@@ -13,6 +13,13 @@ def performance_list(request):
     if request.user.role == 'employee':
         reviews = reviews.filter(employee__user=request.user)
         
+    employee_id = request.GET.get('employee')
+    selected_employee = None
+    if employee_id:
+        reviews = reviews.filter(employee_id=employee_id)
+        from apps.employees.models import Employee
+        selected_employee = Employee.objects.filter(id=employee_id).first()
+        
     if search_query:
         reviews = reviews.filter(
             Q(employee__user__first_name__icontains=search_query) |
@@ -20,4 +27,8 @@ def performance_list(request):
             Q(period__icontains=search_query)
         )
         
-    return render(request, 'performance.html', {'reviews': reviews, 'search_query': search_query})
+    return render(request, 'performance.html', {
+        'reviews': reviews, 
+        'search_query': search_query,
+        'selected_employee': selected_employee
+    })
