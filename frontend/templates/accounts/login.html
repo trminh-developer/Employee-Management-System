@@ -1,10 +1,21 @@
 {% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Employee Management System</title>
+    <title>Đăng nhập - Hệ Thống Quản Lý Nhân Sự (EMS)</title>
+    <meta name="description" content="Cổng đăng nhập Hệ Thống Quản Lý Nhân Sự (EMS Platform) - Quản trị hồ sơ nhân viên, chấm công, nghỉ phép, bảng lương và đánh giá KPI doanh nghiệp." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:title" content="Đăng nhập - Hệ Thống Quản Lý Nhân Sự (EMS)" />
+    <meta property="og:description" content="Cổng đăng nhập Hệ Thống Quản Lý Nhân Sự (EMS Platform) dành cho doanh nghiệp." />
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
@@ -12,6 +23,19 @@
     <link rel="stylesheet" href="{% static 'css/design-system.css' %}" />
     <link rel="stylesheet" href="{% static 'css/components.css' %}" />
     <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "EMS Platform - Hệ Thống Quản Lý Nhân Sự",
+      "url": "{{ request.scheme }}://{{ request.get_host }}/",
+      "inLanguage": "vi-VN",
+      "publisher": {
+        "@type": "Organization",
+        "name": "EMS Enterprise HR Portal"
+      }
+    }
+    </script>
   </head>
   <body>
     <div class="login-split">

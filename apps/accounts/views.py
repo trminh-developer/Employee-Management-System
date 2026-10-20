@@ -11,7 +11,7 @@ def user_list(request):
     search_query = request.GET.get('q', '')
     role_filter = request.GET.get('role', '')
     
-    users = User.objects.all().order_by('-date_joined')
+    users = User.objects.select_related('employee_profile').all().order_by('id')
     
     if search_query:
         from django.db.models import Q

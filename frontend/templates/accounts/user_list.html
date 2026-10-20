@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Quản lý Tài khoản & Phân quyền - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Quản trị tài khoản người dùng, phân quyền RBAC (Admin, HR, Manager, Employee) và trạng thái kích hoạt trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
+{% block og_title %}Quản lý Tài khoản & Phân quyền - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <style>
@@ -162,20 +164,17 @@
     font-size: 12px;
     font-weight: 600;
 }
-.badge-success { background: #c6f6d5; color: #22543d; }
-.badge-warning { background: #feebc8; color: #7b341e; }
 
-.btn-action {
-    color: var(--primary-500);
-    text-decoration: none;
-    margin-right: 15px;
-    font-weight: 600;
-    font-size: 14px;
-}
-.btn-action:hover { color: var(--primary-600); text-decoration: underline; }
+
+
+
 </style>
 
 <div class="employee-workspace">
+    <div class="page-header" style="margin-bottom: 20px;">
+        <h1>Quản lý Tài khoản &amp; Phân quyền</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Quản trị tài khoản đăng nhập, vai trò RBAC và trạng thái hoạt động.</p>
+    </div>
     <form method="GET" class="toolbar">
         <div class="search-box">
             <input type="text" name="q" value="{{ search_query }}" placeholder="Tìm kiếm tài khoản (Tên, Email)..." class="form-input">
@@ -220,14 +219,15 @@
                         </span>
                     </td>
                     <td>
-                        {% if u.is_active %}
-                        <span class="badge badge-success">Hoạt động</span>
+                        {% if not u.is_active or u.employee_profile.status == 'inactive' %}
+                        <span class="badge badge-warning">Inactive</span>
                         {% else %}
-                        <span style="color: var(--text-secondary);">Đã khóa</span>
+                        <span class="badge badge-success">Active</span>
                         {% endif %}
                     </td>
                     <td>
                         <a href="#" onclick="openCrudModal('/admin/accounts/user/{{ u.id }}/change/?_popup=1', 'Chỉnh sửa tài khoản'); return false;" class="btn-action">Sửa</a>
+                        <a href="#" onclick="openCrudModal('/admin/accounts/user/{{ u.id }}/delete/?_popup=1', 'Xóa tài khoản'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -242,3 +242,7 @@
     </div>
 </div>
 {% endblock %}
+
+
+
+
