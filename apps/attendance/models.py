@@ -1,7 +1,10 @@
+from typing import Any
 from django.db import models
 from apps.employees.models import Employee
 
 class Attendance(models.Model):
+    id: int
+    pk: Any
     STATUS_CHOICES = [
         ('present', 'Present'),
         ('late', 'Late'),
