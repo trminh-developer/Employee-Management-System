@@ -31,22 +31,22 @@ EMS.{% endblock %}
     <div class="content-card">
         <div class="card-header" style="padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
             <form method="GET" class="card-toolbar" id="employeeSearchForm" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0;">
-                <div style="position: relative; width: 220px;">
-                    <i data-lucide="search" style="position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;"></i>
+                <div class="input-icon-wrapper" style="position: relative; width: 230px;">
+                    <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;"></i>
                     <input type="text" id="employeeSearchInput" name="q" value="{{ search_query }}" 
                            placeholder="Tìm tên, mã NV, phòng ban..." 
-                           class="form-input" style="padding-left: 30px; padding-right: 24px; width: 100%; height: 32px; font-size: 0.82rem;" autocomplete="off">
+                           class="form-input" style="padding-left: 32px !important; padding-right: 24px !important; width: 100% !important; height: 32px; font-size: 0.82rem;" autocomplete="off">
                     <button type="button" id="employeeSearchClear" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px 4px; display: {% if search_query %}block{% else %}none{% endif %}; font-size: 12px;" title="Xóa tìm kiếm">✕</button>
                 </div>
 
-                <select name="department" id="departmentFilter" class="form-select" style="width: auto; max-width: 170px; height: 32px; font-size: 0.82rem; padding: 0.25rem 0.65rem;">
+                <select name="department" id="departmentFilter" class="form-select" style="width: auto; min-width: 165px; height: 32px; font-size: 0.82rem; padding: 0.25rem 2rem 0.25rem 0.65rem !important;">
                     <option value="">Tất cả phòng ban</option>
                     {% for d in departments %}
                     <option value="{{ d.id }}" {% if request.GET.department == d.id|stringformat:"s" or selected_department == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
                     {% endfor %}
                 </select>
 
-                <select name="status" id="statusFilter" class="form-select" style="width: auto; max-width: 140px; height: 32px; font-size: 0.82rem; padding: 0.25rem 0.65rem;">
+                <select name="status" id="statusFilter" class="form-select" style="width: auto; min-width: 155px; height: 32px; font-size: 0.82rem; padding: 0.25rem 2rem 0.25rem 0.65rem !important;">
                     <option value="">Tất cả trạng thái</option>
                     <option value="active" {% if request.GET.status == 'active' or selected_status == 'active' %}selected{% endif %}>Đang làm việc</option>
                     <option value="on_leave" {% if request.GET.status == 'on_leave' or selected_status == 'on_leave' %}selected{% endif %}>Nghỉ phép</option>
@@ -54,7 +54,7 @@ EMS.{% endblock %}
                     <option value="inactive" {% if request.GET.status == 'inactive' or selected_status == 'inactive' %}selected{% endif %}>Đã nghỉ việc</option>
                 </select>
 
-                <button type="submit" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.82rem; padding: 0 10px;">Lọc</button>
+                <button type="submit" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.82rem; padding: 0 12px; white-space: nowrap;">Lọc</button>
             </form>
 
             <span style="font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; margin-left: auto;">

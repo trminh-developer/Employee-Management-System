@@ -226,19 +226,30 @@ label,
 
 .card-toolbar .form-input,
 .card-toolbar input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]) {
-    width: auto !important;
-    max-width: 240px;
+    width: auto;
     height: 32px !important;
-    padding: 0.25rem 0.65rem !important;
+    padding: 0.25rem 0.65rem;
     font-size: 0.82rem !important;
+}
+
+.card-toolbar .input-icon-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.card-toolbar .input-icon-wrapper input {
+    padding-left: 32px !important;
+    padding-right: 24px !important;
+    width: 100% !important;
+    max-width: none !important;
 }
 
 .card-toolbar .form-select,
 .card-toolbar select {
     width: auto !important;
-    max-width: 180px;
     height: 32px !important;
-    padding: 0.25rem 0.65rem !important;
+    padding: 0.25rem 2rem 0.25rem 0.65rem !important;
     font-size: 0.82rem !important;
     cursor: pointer;
 }
@@ -247,6 +258,7 @@ label,
     height: 32px !important;
     padding: 0.25rem 0.75rem !important;
     font-size: 0.82rem !important;
+    white-space: nowrap;
 }
 
 .card-body {
