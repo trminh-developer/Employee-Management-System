@@ -1,57 +1,84 @@
 {% extends 'base.html' %}
-{% block title %}Quản lý Bảng lương - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Bảng Lương Doanh Nghiệp (Payroll) - Hệ Thống Quản Lý Nhân Sự (EMS){% endblock %}
 {% block meta_description %}Tổng hợp và quản lý bảng lương nhân viên theo kỳ, bao gồm lương cơ sở, phụ cấp, khấu trừ thuế và lương thực nhận.{% endblock %}
-{% block og_title %}Quản lý Bảng lương - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block og_title %}Bảng Lương Doanh Nghiệp (Payroll) - EMS{% endblock %}
 
 {% block content %}
-<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+<div class="page-header">
     <div>
-        <h1>Quản lý Bảng lương</h1>
-        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Tính toán và quản lý lương nhân viên.</p>
+        <h1 class="page-title">Bảng Lương Doanh Nghiệp (Payroll Management)</h1>
+        <p class="page-subtitle">Tính toán lương Gross, BHXH bắt buộc, Thuế TNCN và tiền thực nhận Net</p>
     </div>
-    <button type="button" id="addNew" class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px;" onclick="openCrudModal('/admin/payroll/payroll/add/?_popup=1', 'Tính lương tháng này'); return false;">Tính lương tháng này</button>
+    <div>
+        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+        <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/payroll/payroll/add/?_popup=1', 'Tính Lương Kỳ Mới'); return false;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Tính Lương Kỳ Mới
+        </button>
+        {% endif %}
+    </div>
 </div>
 
-<div class="table-container" style="background: var(--bg-surface); border-radius: 10px; border: 1px solid var(--border-color); overflow-x: auto;">
-    <table class="data-table" style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="background-color: var(--bg-surface-alt); text-transform: uppercase; font-size: 12px; color: var(--text-secondary);">
-                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Kỳ lương</th>
-                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Nhân viên</th>
-                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Lương cơ sở</th>
-                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thực nhận</th>
-                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Trạng thái</th>
-                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for rec in records %}
-            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
-                <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.month }}/{{ rec.year }}</td>
-                <td style="padding: 16px 20px; color: var(--text-primary);"><strong>{{ rec.employee.user.get_full_name }}</strong></td>
-                <td style="padding: 16px 20px; color: var(--text-primary);">${{ rec.base_salary }}</td>
-                <td style="padding: 16px 20px; font-weight:bold; color: var(--success-600);">${{ rec.net_salary }}</td>
-                <td style="padding: 16px 20px;">
-                    <span class="badge {% if rec.status == 'paid' %}badge-success{% elif rec.status == 'approved' %}badge-primary{% else %}badge-secondary{% endif %}">
-                        {{ rec.get_status_display }}
-                    </span>
-                </td>
-                <td style="padding: 16px 20px;">
-                    <a href="#" onclick="openCrudModal('/admin/payroll/payroll/{{ rec.id }}/change/?_popup=1', 'Sửa'); return false;" class="btn-action">Sửa</a>
-                    <a href="#" onclick="openCrudModal('/admin/payroll/payroll/{{ rec.id }}/delete/?_popup=1', 'Xóa'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align:center; padding: 30px; color: var(--text-secondary);">Chưa có bản ghi lương nào.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="content-card">
+    <div class="card-header">
+        <h2 class="card-title">Bảng Kê Chi Trả Lương Nhân Viên</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">
+            Tổng cộng: <strong style="color: var(--text-primary);">{{ records|length }}</strong> bản ghi lương
+        </span>
+    </div>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>KỲ LƯƠNG</th>
+                    <th>NHÂN VIÊN</th>
+                    <th>LƯƠNG CƠ SỞ</th>
+                    <th>PHỤ CẤP / THƯỞNG</th>
+                    <th>THỰC NHẬN (NET)</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>HÀNH ĐỘNG</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rec in records %}
+                <tr>
+                    <td style="font-family: var(--font-mono); font-weight: 700; color: var(--brand-primary);">
+                        T{{ rec.month }}/{{ rec.year }}
+                    </td>
+                    <td>
+                        <strong style="color: var(--text-primary);">{{ rec.employee.user.get_full_name }}</strong><br>
+                        <small style="color: var(--text-muted);">{{ rec.employee.department.name|default:"-" }}</small>
+                    </td>
+                    <td style="font-family: var(--font-mono); font-weight: 600;">
+                        {{ rec.base_salary|floatformat:0 }} đ
+                    </td>
+                    <td style="font-family: var(--font-mono); color: var(--text-secondary);">
+                        {{ rec.allowances|default:0|floatformat:0 }} đ
+                    </td>
+                    <td style="font-family: var(--font-mono); font-weight: 700; color: var(--status-success); font-size: 0.95rem;">
+                        {{ rec.net_salary|floatformat:0 }} đ
+                    </td>
+                    <td>
+                        <span class="badge {% if rec.status == 'paid' %}badge-success{% elif rec.status == 'approved' %}badge-primary{% else %}badge-neutral{% endif %}">
+                            {{ rec.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+                        <a href="#" onclick="openCrudModal('/admin/payroll/payroll/{{ rec.id }}/change/?_popup=1', 'Sửa Phiếu Lương'); return false;" class="btn-action">Sửa</a>
+                        <a href="#" onclick="openCrudModal('/admin/payroll/payroll/{{ rec.id }}/delete/?_popup=1', 'Xóa Phiếu Lương'); return false;" class="btn-action" style="color: var(--status-danger);">Xóa</a>
+                        {% else %}
+                        <a href="#" onclick="window.print(); return false;" class="btn-action">In Phiếu</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center; padding: 36px 20px; color: var(--text-secondary);">Chưa có bản ghi lương nào trong hệ thống.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
-
-
-
-
-

@@ -25,9 +25,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=3">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=3">
-    <link rel="stylesheet" href="{% static 'css/layout.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}?v=4">
     
     <!-- Theme Initialization (Prevents FOUC) -->
     <script>
@@ -58,72 +58,86 @@
         {% if '_popup' not in request.GET %}
         <aside id="sidebar" class="sidebar" aria-label="Điều hướng chính">
             <div class="sidebar-header">
-                <div class="sidebar-brand">
-                    <i data-lucide="building-2"></i> HR Portal
-                </div>
+                <a href="{% url 'dashboard' %}" class="sidebar-brand">
+                    <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--primary-600), #0d9488); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; box-shadow: var(--shadow-sm); flex-shrink: 0;">E</div>
+                    <div style="display: flex; flex-direction: column; line-height: 1.15;">
+                        <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; color: var(--text-primary);">EMS Platform</span>
+                        <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 500;">Quản Trị Nhân Sự</span>
+                    </div>
+                </a>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Đóng/Mở thanh bên">
                     <i data-lucide="menu"></i>
                 </button>
             </div>
             
-            <div class="user-profile-mini">
-                <div class="avatar" style="background: var(--primary-100); color: var(--primary-700); font-weight: 600; overflow: hidden; flex-shrink: 0;">
-                    {% if request.user.employee_profile and request.user.employee_profile.avatar %}
-                        <img src="{{ request.user.employee_profile.avatar.url }}" width="40" height="40" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="Ảnh đại diện của {{ request.user.get_full_name|default:request.user.username }}">
-                    {% else %}
-                        {{ request.user.username|slice:":2"|upper|default:"QT" }}
-                    {% endif %}
-                </div>
-                <div class="user-info">
-                    <span class="user-name" style="font-weight: 600; font-size: 0.875rem; overflow: hidden; text-overflow: ellipsis;">{{ request.user.get_full_name|default:request.user.username }}</span>
-                    <span class="user-role" style="font-size: 0.75rem; color: var(--text-secondary); text-transform: capitalize;">{{ request.user.role|default:"Quản trị viên" }}</span>
-                </div>
-            </div>
-            
             <nav class="sidebar-nav" aria-label="Danh mục phân hệ">
+                <div class="nav-section-title">Tổng quan</div>
                 <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i data-lucide="layout-dashboard" class="nav-icon"></i>
-                    <span class="nav-text">Tổng quan</span>
+                    <span class="nav-text">Bảng Điều Khiển</span>
                 </a>
-                <a href="{% url 'employees:list' %}" class="nav-item {% if request.resolver_match.app_name == 'employees' %}active{% endif %}">
+
+                <div class="nav-section-title">Quản lý nhân sự</div>
+                <a href="{% url 'employees:list' %}" class="nav-item {% if request.resolver_match.app_name == 'employees' and request.resolver_match.url_name != 'my_profile' %}active{% endif %}">
                     <i data-lucide="users" class="nav-icon"></i>
-                    <span class="nav-text">Nhân viên</span>
+                    <span class="nav-text">Hồ Sơ Nhân Viên</span>
                 </a>
                 <a href="{% url 'departments:list' %}" class="nav-item {% if request.resolver_match.app_name == 'departments' %}active{% endif %}">
                     <i data-lucide="network" class="nav-icon"></i>
-                    <span class="nav-text">Phòng ban</span>
+                    <span class="nav-text">Cơ Cấu Phòng Ban</span>
                 </a>
                 <a href="{% url 'attendance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'attendance' %}active{% endif %}">
                     <i data-lucide="clock" class="nav-icon"></i>
-                    <span class="nav-text">Chấm công</span>
+                    <span class="nav-text">Chấm Công Thời Gian</span>
                 </a>
                 <a href="{% url 'leave:list' %}" class="nav-item {% if request.resolver_match.app_name == 'leave' %}active{% endif %}">
                     <i data-lucide="calendar-off" class="nav-icon"></i>
-                    <span class="nav-text">Nghỉ phép</span>
+                    <span class="nav-text">Đơn Nghỉ Phép</span>
                 </a>
+
+                <div class="nav-section-title">Tài chính & Hiệu suất</div>
                 <a href="{% url 'payroll:list' %}" class="nav-item {% if request.resolver_match.app_name == 'payroll' %}active{% endif %}">
                     <i data-lucide="banknote" class="nav-icon"></i>
-                    <span class="nav-text">Bảng lương</span>
+                    <span class="nav-text">Bảng Lương (Payroll)</span>
                 </a>
                 <a href="{% url 'performance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'performance' %}active{% endif %}">
-                    <i data-lucide="trending-up" class="nav-icon"></i>
-                    <span class="nav-text">Đánh giá</span>
+                    <i data-lucide="star" class="nav-icon"></i>
+                    <span class="nav-text">Đánh Giá KPI Quý</span>
                 </a>
                 <a href="{% url 'reports:list' %}" class="nav-item {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
                     <i data-lucide="pie-chart" class="nav-icon"></i>
-                    <span class="nav-text">Báo cáo</span>
+                    <span class="nav-text">Báo Cáo & Thống Kê</span>
                 </a>
+
+                <div class="nav-section-title">Hệ thống & Quản trị</div>
                 <a href="{% url 'notifications:list' %}" class="nav-item {% if request.resolver_match.app_name == 'notifications' %}active{% endif %}">
                     <i data-lucide="bell" class="nav-icon"></i>
-                    <span class="nav-text">Thông báo</span>
+                    <span class="nav-text">Thông Báo</span>
                 </a>
                 {% if request.user.role == 'admin' %}
-                <a href="{% url 'accounts:user_list' %}" class="nav-item {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+                <a href="{% url 'accounts:user_list' %}" class="nav-item {% if request.resolver_match.app_name == 'accounts' or request.resolver_match.url_name == 'user_list' %}active{% endif %}">
                     <i data-lucide="shield" class="nav-icon"></i>
-                    <span class="nav-text">Quản lý Tài khoản</span>
+                    <span class="nav-text">Quản Lý Tài Khoản</span>
                 </a>
                 {% endif %}
             </nav>
+
+            <!-- User Mini Profile Footer (No Simulator Dropdown) -->
+            <div class="sidebar-user-footer">
+                <a href="{% url 'employees:my_profile' %}" class="user-profile-card" title="Xem hồ sơ cá nhân của bạn">
+                    <div class="avatar avatar-sm" style="background: var(--primary-100); color: var(--primary-700); font-weight: 700; overflow: hidden; flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;">
+                        {% if request.user.employee_profile and request.user.employee_profile.avatar %}
+                            <img src="{{ request.user.employee_profile.avatar.url }}" width="34" height="34" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                        {% else %}
+                            {{ request.user.username|slice:":2"|upper|default:"AD" }}
+                        {% endif %}
+                    </div>
+                    <div class="user-details" style="min-width: 0; flex: 1;">
+                        <span class="user-name" style="font-weight: 600; font-size: 0.82rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary);">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        <span class="user-role-badge" style="font-size: 0.7rem; color: var(--primary-600); font-weight: 600; text-transform: uppercase;">{{ request.user.role|default:"Quản trị viên" }}</span>
+                    </div>
+                </a>
+            </div>
         </aside>
         {% endif %}
 
@@ -161,9 +175,9 @@
                         
                         <!-- Dropdown Menu -->
                         <div id="profile-dropdown" class="dropdown-menu">
-                            <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;">
-                                <strong style="color: var(--text-primary); display: block;">{{ request.user.get_full_name|default:request.user.username }}</strong>
-                                <small style="color: var(--text-secondary);">{{ request.user.email|default:"admin@example.com" }}</small>
+                            <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; box-sizing: border-box; overflow: hidden;">
+                                <strong style="color: var(--text-primary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9rem;" title="{{ request.user.get_full_name|default:request.user.username }}">{{ request.user.get_full_name|default:request.user.username }}</strong>
+                                <small style="color: var(--text-secondary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.78rem;" title="{{ request.user.email|default:'admin@example.com' }}">{{ request.user.email|default:"admin@example.com" }}</small>
                             </div>
                             
                             <a href="{% url 'employees:my_profile' %}" class="dropdown-item">

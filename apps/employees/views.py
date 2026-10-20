@@ -10,7 +10,17 @@ def employees_list(request):
     department_id = request.GET.get('department', '')
     status = request.GET.get('status', '')
 
-    employees = Employee.objects.select_related('user', 'department', 'position')
+    from apps.payroll.models import Payroll
+    from apps.performance.models import PerformanceReview
+    from django.db.models import Subquery, OuterRef
+
+    latest_payroll_subquery = Payroll.objects.filter(employee=OuterRef('pk')).order_by('-year', '-month')
+    latest_kpi_subquery = PerformanceReview.objects.filter(employee=OuterRef('pk')).order_by('-created_at')
+
+    employees = Employee.objects.select_related('user', 'department', 'position', 'manager__user').annotate(
+        latest_base_salary=Subquery(latest_payroll_subquery.values('base_salary')[:1]),
+        latest_kpi_score=Subquery(latest_kpi_subquery.values('score')[:1])
+    )
 
     if search_query:
         from django.db.models.functions import Concat

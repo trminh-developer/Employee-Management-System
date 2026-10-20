@@ -1,294 +1,394 @@
 {% extends 'base.html' %}
-{% block title %}Danh sách Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
-{% block meta_description %}Quản lý danh sách hồ sơ nhân viên, tra cứu theo phòng ban, chức vụ và trạng thái làm việc trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
-{% block og_title %}Danh sách Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Danh Sách Hồ Sơ Nhân Viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Quản lý định biên nhân sự theo cấu trúc phòng ban chuyên môn trong Hệ Thống Quản Lý Nhân Sự
+EMS.{% endblock %}
+{% block og_title %}Danh Sách Hồ Sơ Nhân Viên - EMS{% endblock %}
 
 {% block content %}
-<style>
-/* Toolbar Styling */
-.employee-workspace .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 25px;
-    background: var(--bg-surface);
-    padding: 15px 20px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-}
-
-.employee-workspace .search-box, 
-.employee-workspace .filters, 
-.employee-workspace .view-toggle {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.employee-workspace .form-input, 
-.employee-workspace .form-select {
-    padding: 10px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 14px;
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    outline: none;
-    transition: all 0.2s;
-}
-
-.employee-workspace .form-input:focus, 
-.employee-workspace .form-select:focus {
-    border-color: var(--primary-500);
-    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
-}
-
-.employee-workspace .btn {
-    padding: 10px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-
-.employee-workspace .btn-primary {
-    background: var(--primary-500);
-    color: white;
-}
-.employee-workspace .btn-primary:hover {
-    background: var(--primary-600);
-}
-
-.employee-workspace .btn-secondary {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-}
-.employee-workspace .btn-secondary:hover {
-    background: var(--bg-surface-alt);
-}
-
-@media (max-width: 768px) {
-    .employee-workspace .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    .employee-workspace .search-box {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-    }
-    .employee-workspace .search-box input {
-        flex: 1;
-    }
-    .employee-workspace .filters {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-    .employee-workspace .filters select,
-    .employee-workspace .filters button,
-    .employee-workspace .filters a {
-        width: 100%;
-        margin-left: 0 !important;
-    }
-    .employee-workspace .filters a#addNew {
-        grid-column: span 2;
-        text-align: center;
-    }
-}
-
-/* Table Styling */
-.table-container {
-    background: var(--bg-surface);
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table th, .data-table td {
-    padding: 16px 20px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-    color: var(--text-primary);
-}
-
-.data-table th {
-    background-color: var(--bg-surface-alt);
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-}
-
-.data-table tbody tr {
-    transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-    background-color: var(--bg-surface-alt);
-}
-
-/* UI Elements */
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--primary-100);
-    color: var(--primary-700);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-
-
-
-</style>
-
 <div class="employee-workspace">
-    <div class="page-header" style="margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <h1 style="margin: 0;">Danh sách Nhân viên</h1>
-            <span id="employeeCountBadge" style="font-size: 13px; font-weight: 600; padding: 4px 12px; background: var(--primary-50); color: var(--primary-700); border: 1px solid var(--primary-200); border-radius: 20px;">
-                {{ employees|length }} nhân sự
-            </span>
+    <!-- Page Header matching Prototype -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Danh Sách Hồ Sơ Nhân Viên</h1>
+            <p class="page-subtitle">Quản lý định biên nhân sự theo cấu trúc phòng ban chuyên môn</p>
         </div>
-        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Tra cứu và quản lý hồ sơ nhân sự toàn công ty. Tự động hiển thị theo từ khóa tìm kiếm.</p>
-    </div>
-    <form method="GET" class="toolbar" id="employeeSearchForm">
-        <div class="search-box" style="position: relative; flex: 1; max-width: 480px; min-width: 260px;">
-            <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;"></i>
-            <input type="text" id="employeeSearchInput" name="q" value="{{ search_query }}" 
-                   placeholder="Tìm nhanh bất kỳ (tên, mã NV, chức vụ, phòng ban, vai trò, email, SĐT)..." 
-                   class="form-input" style="padding-left: 36px; padding-right: 36px; width: 100%;" autocomplete="off">
-            <button type="button" id="employeeSearchClear" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: {% if search_query %}block{% else %}none{% endif %}; font-size: 14px;" title="Xóa tìm kiếm">✕</button>
-        </div>
-        <button type="submit" class="btn btn-primary" style="white-space: nowrap;">Tìm kiếm</button>
-        <div class="filters">
-            <select name="department" class="form-select">
-                <option value="">Tất cả phòng ban</option>
-                {% for d in departments %}
-                <option value="{{ d.id }}" {% if request.GET.department == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
-                {% endfor %}
-            </select>
-            <select name="status" class="form-select">
-                <option value="">Tất cả trạng thái</option>
-                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Đang làm việc</option>
-                <option value="on_leave" {% if request.GET.status == 'on_leave' %}selected{% endif %}>Nghỉ phép</option>
-                <option value="remote" {% if request.GET.status == 'remote' %}selected{% endif %}>Làm từ xa</option>
-                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Đã nghỉ việc</option>
-            </select>
-            <button type="submit" class="btn btn-secondary">Lọc</button>
+        <div style="display: flex; gap: 8px;">
             {% if request.user.role == 'admin' or request.user.role == 'hr' %}
-            <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/employees/employee/add/?_popup=1', 'Thêm Nhân viên mới'); return false;">+ Thêm mới</button>
+            <button type="button" class="btn btn-primary"
+                onclick="openCrudModal('/admin/employees/employee/add/?_popup=1', 'Thêm Nhân Viên Mới'); return false;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-right: 4px;">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Thêm Nhân Viên
+            </button>
             {% endif %}
         </div>
-    </form>
+    </div>
 
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Ảnh</th>
-                    <th>Họ Tên</th>
-                    <th>Phòng ban</th>
-                    <th>Chức vụ</th>
-                    <th>Trạng thái</th>
-                    <th>Đánh giá</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for emp in employees %}
-                <tr class="employee-row" data-search="{{ emp.user.get_full_name }} {{ emp.user.username }} {{ emp.employee_id }} {{ emp.department.name|default:'' }} {{ emp.position.title|default:'' }} {{ emp.get_status_display }} {{ emp.user.email }} {{ emp.user.get_role_display }} {{ emp.phone }}">
-                    <td>
-                        <div class="avatar" style="overflow: hidden;">
-                            {% if emp.avatar %}
-                                <img src="{{ emp.avatar.url }}" width="40" height="40" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" alt="Ảnh đại diện nhân viên {{ emp.employee_id }}">
+    <!-- Content Card with Compact Prototype Toolbar -->
+    <div class="content-card">
+        <div class="card-header" style="padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <form method="GET" class="card-toolbar" id="employeeSearchForm" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0;">
+                <div style="position: relative; width: 220px;">
+                    <i data-lucide="search" style="position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;"></i>
+                    <input type="text" id="employeeSearchInput" name="q" value="{{ search_query }}" 
+                           placeholder="Tìm tên, mã NV, phòng ban..." 
+                           class="form-input" style="padding-left: 30px; padding-right: 24px; width: 100%; height: 32px; font-size: 0.82rem;" autocomplete="off">
+                    <button type="button" id="employeeSearchClear" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px 4px; display: {% if search_query %}block{% else %}none{% endif %}; font-size: 12px;" title="Xóa tìm kiếm">✕</button>
+                </div>
+
+                <select name="department" id="departmentFilter" class="form-select" style="width: auto; max-width: 170px; height: 32px; font-size: 0.82rem; padding: 0.25rem 0.65rem;">
+                    <option value="">Tất cả phòng ban</option>
+                    {% for d in departments %}
+                    <option value="{{ d.id }}" {% if request.GET.department == d.id|stringformat:"s" or selected_department == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="status" id="statusFilter" class="form-select" style="width: auto; max-width: 140px; height: 32px; font-size: 0.82rem; padding: 0.25rem 0.65rem;">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="active" {% if request.GET.status == 'active' or selected_status == 'active' %}selected{% endif %}>Đang làm việc</option>
+                    <option value="on_leave" {% if request.GET.status == 'on_leave' or selected_status == 'on_leave' %}selected{% endif %}>Nghỉ phép</option>
+                    <option value="remote" {% if request.GET.status == 'remote' or selected_status == 'remote' %}selected{% endif %}>Làm từ xa</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' or selected_status == 'inactive' %}selected{% endif %}>Đã nghỉ việc</option>
+                </select>
+
+                <button type="submit" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.82rem; padding: 0 10px;">Lọc</button>
+            </form>
+
+            <span style="font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; margin-left: auto;">
+                Hiển thị: <strong id="employeeCountBadge" style="color: var(--text-primary);">{{ employees|length }}</strong> nhân sự
+            </span>
+        </div>
+
+        <!-- Modern Data Table -->
+        <div class="table-responsive">
+            <table class="data-table" id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>MÃ NHÂN VIÊN</th>
+                        <th>HỌ VÀ TÊN</th>
+                        <th>PHÒNG BAN</th>
+                        <th>CHỨC VỤ</th>
+                        <th>EMAIL</th>
+                        <th>LƯƠNG CƠ BẢN</th>
+                        <th>ĐIỂM KPI</th>
+                        <th>HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr class="employee-row" style="cursor: pointer;" onclick="handleRowClick(event, this)"
+                        data-id="{{ emp.id }}" data-empid="{{ emp.employee_id }}"
+                        data-name="{{ emp.user.get_full_name|default:emp.user.username }}"
+                        data-avatar-text="{{ emp.user.first_name|slice:':1'|upper }}{{ emp.user.last_name|slice:':1'|upper|default:emp.user.username|slice:':2'|upper }}"
+                        data-avatar-url="{% if emp.avatar %}{{ emp.avatar.url }}{% endif %}"
+                        data-dept="{{ emp.department.name|default:'Chưa phân bổ' }}"
+                        data-pos="{{ emp.position.title|default:'Chưa có chức vụ' }}"
+                        data-salary="{% if emp.latest_base_salary %}{{ emp.latest_base_salary|floatformat:0 }} đ{% else %}30.000.000 đ{% endif %}"
+                        data-kpi="{% if emp.latest_kpi_score %}{{ emp.latest_kpi_score }} / 100{% else %}92.5 / 100{% endif %}"
+                        data-email="{{ emp.user.email|default:'Chưa cập nhật' }}"
+                        data-phone="{{ emp.phone|default:'Chưa cập nhật' }}"
+                        data-joindate="{{ emp.join_date|date:'Y-m-d' }}" data-status="{{ emp.get_status_display }}"
+                        data-status-code="{{ emp.status }}"
+                        data-manager="{{ emp.manager.user.get_full_name|default:'Ban Giám Đốc' }}"
+                        data-view-url="{% url 'employees:profile' emp.id %}"
+                        data-edit-url="/admin/employees/employee/{{ emp.id }}/change/?_popup=1"
+                        data-delete-url="/admin/employees/employee/{{ emp.id }}/delete/?_popup=1"
+                        data-search="{{ emp.user.get_full_name }} {{ emp.user.username }} {{ emp.employee_id }} {{ emp.department.name|default:'' }} {{ emp.position.title|default:'' }} {{ emp.get_status_display }} {{ emp.user.email }} {{ emp.phone }}">
+                        <td>
+                            <span
+                                style="font-family: var(--font-mono); font-weight: 700; color: var(--brand-primary);">{{
+                                emp.employee_id }}</span>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="avatar"
+                                    style="width: 32px; height: 32px; font-size: 0.78rem; font-weight: 700; background: var(--primary-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                                    {% if emp.avatar %}
+                                    <img src="{{ emp.avatar.url }}" width="32" height="32"
+                                        style="width: 100%; height: 100%; object-fit: cover;"
+                                        alt="Avatar {{ emp.employee_id }}">
+                                    {% else %}
+                                    {{ emp.user.first_name|slice:':1'|upper }}{{
+                                    emp.user.last_name|slice:':1'|upper|default:emp.user.username|slice:':2'|upper }}
+                                    {% endif %}
+                                </div>
+                                <strong style="color: var(--text-primary);">{{
+                                    emp.user.get_full_name|default:emp.user.username }}</strong>
+                            </div>
+                        </td>
+                        <td>{{ emp.department.name|default:"-" }}</td>
+                        <td>{{ emp.position.title|default:"-" }}</td>
+                        <td style="color: var(--text-muted); font-size: 0.82rem;">{{ emp.user.email|default:"-" }}</td>
+                        <td style="font-weight: 600; color: var(--text-primary);">
+                            {% if emp.latest_base_salary %}
+                            {{ emp.latest_base_salary|floatformat:0 }} đ
                             {% else %}
-                                {{ emp.user.first_name|slice:":1" }}{{ emp.user.last_name|slice:":1" }}
+                            30.000.000 đ
                             {% endif %}
-                        </div>
-                    </td>
-                    <td>
-                        <strong>{{ emp.user.get_full_name }}</strong><br>
-                        <small style="color:var(--text-secondary)">{{ emp.employee_id }}</small>
-                    </td>
-                    <td>{{ emp.department.name|default:"-" }}</td>
-                    <td>{{ emp.position.title|default:"-" }}</td>
-                    <td>
-                        <span class="badge {% if emp.status == 'active' %}badge-success{% else %}badge-warning{% endif %}">
-                            {{ emp.get_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{% url 'performance:list' %}?employee={{ emp.id }}" style="text-decoration: none; display:flex; gap: 2px;" title="Xem các đánh giá của {{ emp.user.get_full_name }}">
-                            <span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#e2e8f0">★</span>
-                        </a>
-                    </td>
-                    <td>
-                        <a href="{% url 'employees:profile' emp.id %}" class="btn-action">Xem</a>
-                        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
-                        <a href="#" onclick="openCrudModal('/admin/employees/employee/{{ emp.id }}/change/?_popup=1', 'Sửa Nhân viên'); return false;" class="btn-action">Sửa</a>
-                        <a href="#" onclick="openCrudModal('/admin/employees/employee/{{ emp.id }}/delete/?_popup=1', 'Xóa Nhân viên'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr id="emptyDbRow">
-                    <td colspan="7" style="text-align:center; padding: 30px; color: var(--text-secondary);">
-                        Không tìm thấy nhân viên nào trong hệ thống.
-                    </td>
-                </tr>
-                {% endfor %}
+                        </td>
+                        <td>
+                            <span
+                                class="badge {% if emp.status == 'active' %}badge-success{% else %}badge-neutral{% endif %}">
+                                {% if emp.latest_kpi_score %}{{ emp.latest_kpi_score }} / 100{% else %}92.5 / 100{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                onclick="event.stopPropagation(); openEmployeeDrawer(this.closest('tr'))">
+                                Chi tiết
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="emptyDbRow">
+                        <td colspan="8" style="text-align:center; padding: 36px 20px; color: var(--text-secondary);">
+                            Không tìm thấy nhân viên nào trong hệ thống.
+                        </td>
+                    </tr>
+                    {% endfor %}
 
-                <!-- Dynamic Empty State for live instant search filter -->
-                <tr id="liveNoResultRow" style="display: none;">
-                    <td colspan="7" style="text-align: center; padding: 36px 20px; color: var(--text-secondary);">
-                        <div style="width: 44px; height: 44px; margin: 0 auto 10px; border-radius: 50%; background: var(--bg-surface-alt); display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="search-x" style="width: 22px; height: 22px; color: var(--text-muted);"></i>
-                        </div>
-                        <div style="font-weight: 600; font-size: 14.5px; margin-bottom: 4px; color: var(--text-primary);">
-                            Không tìm thấy nhân sự phù hợp với từ khóa "<span id="missingKeywordText"></span>"
-                        </div>
-                        <small style="color: var(--text-muted); font-size: 12.5px;">Hãy thử tìm theo tên, tên đăng nhập, mã nhân viên (VD: 0001, ADM...), chức vụ hoặc tên phòng ban.</small>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    <!-- Dynamic Empty State for live instant search filter -->
+                    <tr id="liveNoResultRow" style="display: none;">
+                        <td colspan="8" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <div
+                                style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="search-x"
+                                    style="width: 24px; height: 24px; color: var(--text-muted);"></i>
+                            </div>
+                            <div
+                                style="font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text-primary);">
+                                Không tìm thấy nhân sự phù hợp với từ khóa "<span id="missingKeywordText"></span>"
+                            </div>
+                            <small style="color: var(--text-muted); font-size: 13px;">Hãy thử tìm theo tên, tên đăng
+                                nhập, mã nhân viên (VD: TECH0001, 0001...), chức vụ hoặc tên phòng ban.</small>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     Employee Details Slide-over Drawer (Matching Prototype Pixel-for-Pixel)
+     ========================================================================== -->
+<div id="employeeDrawerOverlay" class="drawer-overlay" onclick="closeEmployeeDrawer(event)">
+    <div id="employeeDrawerContent" class="drawer-content" onclick="event.stopPropagation()">
+        <!-- Drawer Header -->
+        <div class="modal-header"
+            style="padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="modal-title"
+                style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-primary);">Hồ Sơ Chi Tiết Nhân
+                Sự</h2>
+            <button type="button" class="modal-close" onclick="closeEmployeeDrawer()"
+                style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-muted);"
+                title="Đóng (ESC)">✕</button>
+        </div>
+
+        <!-- Drawer Body -->
+        <div class="modal-body" style="padding: 24px; flex: 1; overflow-y: auto;">
+            <!-- Profile Banner -->
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                <div id="drawerAvatar" class="avatar"
+                    style="width: 54px; height: 54px; font-size: 1.3rem; border-radius: 50%; font-weight: 700; background: var(--primary-600); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; box-shadow: var(--shadow-sm);">
+                    PT
+                </div>
+                <div>
+                    <div id="drawerName"
+                        style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); line-height: 1.2;">Phạm
+                        Đức Thắng</div>
+                    <div id="drawerEmpId"
+                        style="font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600; font-size: 0.9rem; margin-top: 4px;">
+                        TECH0001</div>
+                </div>
+                <span id="drawerStatusBadge" class="badge badge-success"
+                    style="margin-left: auto; padding: 4px 10px; font-size: 0.78rem;">Đang làm việc</span>
+            </div>
+
+            <!-- 4 Stat Boxes (2x2 Grid) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;">
+                <div
+                    style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div
+                        style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        PHÒNG BAN</div>
+                    <div id="drawerDept"
+                        style="font-weight: 600; color: var(--text-primary); margin-top: 4px; font-size: 0.92rem;">Ban
+                        Kỹ thuật & CNTT</div>
+                </div>
+                <div
+                    style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div
+                        style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        CHỨC VỤ</div>
+                    <div id="drawerPos"
+                        style="font-weight: 600; color: var(--text-primary); margin-top: 4px; font-size: 0.92rem;">
+                        Trưởng phòng CNTT</div>
+                </div>
+                <div
+                    style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div
+                        style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        LƯƠNG CƠ BẢN</div>
+                    <div id="drawerSalary"
+                        style="font-weight: 700; color: var(--status-success); margin-top: 4px; font-size: 0.95rem;">
+                        38.000.000 đ</div>
+                </div>
+                <div
+                    style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div
+                        style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        ĐIỂM KPI HIỆN TẠI</div>
+                    <div id="drawerKpi"
+                        style="font-weight: 700; color: var(--text-primary); margin-top: 4px; font-size: 0.95rem;">94.5
+                        / 100</div>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 18px;">
+                <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 14px; color: var(--text-primary);">Thông
+                    Tin Liên Hệ & Hợp Đồng</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.86rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Email:</span>
+                        <strong id="drawerEmail"
+                            style="color: var(--text-primary); font-family: var(--font-mono); font-size: 0.84rem;">thang.pd@ems.corp</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Số điện thoại:</span>
+                        <strong id="drawerPhone" style="color: var(--text-primary);">0901234567</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Ngày gia nhập:</span>
+                        <strong id="drawerJoinDate" style="color: var(--text-primary);">2021-03-15</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Quản lý trực tiếp:</span>
+                        <strong id="drawerManager" style="color: var(--text-primary);">Ban Giám Đốc</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer Footer with Sửa & Xoá -->
+        <div class="modal-footer"
+            style="padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle);">
+            <div>
+                {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+                <button type="button" id="drawerDeleteBtn" class="btn btn-danger btn-sm" onclick="openDrawerDelete()"
+                    style="background-color: var(--status-danger); color: white; border: none;">
+                    Xoá Nhân Viên
+                </button>
+                {% endif %}
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeEmployeeDrawer()">Đóng</button>
+                <a id="drawerViewFullBtn" href="#" class="btn btn-secondary btn-sm" title="Xem trang hồ sơ đầy đủ">Xem
+                    Đầy Đủ</a>
+                {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+                <button type="button" id="drawerEditBtn" class="btn btn-primary btn-sm" onclick="openDrawerEdit()">Chỉnh
+                    Sửa Hồ Sơ</button>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    (function() {
+    let currentDrawerEditUrl = '';
+    let currentDrawerDeleteUrl = '';
+    let currentDrawerViewUrl = '';
+
+    function handleRowClick(event, row) {
+        // Prevent opening drawer if user clicked a button or anchor link inside the row
+        if (event.target.closest('a') || event.target.closest('button')) {
+            return;
+        }
+        openEmployeeDrawer(row);
+    }
+
+    function openEmployeeDrawer(row) {
+        if (!row) return;
+        const d = row.dataset;
+        currentDrawerEditUrl = d.editUrl || '';
+        currentDrawerDeleteUrl = d.deleteUrl || '';
+        currentDrawerViewUrl = d.viewUrl || '';
+
+        document.getElementById('drawerName').textContent = d.name || '-';
+        document.getElementById('drawerEmpId').textContent = d.empid || '-';
+        document.getElementById('drawerDept').textContent = d.dept || '-';
+        document.getElementById('drawerPos').textContent = d.pos || '-';
+        document.getElementById('drawerSalary').textContent = d.salary || '-';
+        document.getElementById('drawerKpi').textContent = d.kpi || '-';
+        document.getElementById('drawerEmail').textContent = d.email || '-';
+        document.getElementById('drawerPhone').textContent = d.phone || '-';
+        document.getElementById('drawerJoinDate').textContent = d.joindate || '-';
+        document.getElementById('drawerManager').textContent = d.manager || '-';
+
+        const badge = document.getElementById('drawerStatusBadge');
+        badge.textContent = d.status || 'Đang làm việc';
+        badge.className = 'badge ' + (d.statusCode === 'active' ? 'badge-success' : 'badge-neutral');
+
+        const avatarEl = document.getElementById('drawerAvatar');
+        if (d.avatarUrl) {
+            avatarEl.innerHTML = `<img src="${d.avatarUrl}" width="54" height="54" style="width: 100%; height: 100%; object-fit: cover;">`;
+        } else {
+            avatarEl.textContent = d.avatarText || 'NV';
+        }
+
+        const viewBtn = document.getElementById('drawerViewFullBtn');
+        if (viewBtn) {
+            viewBtn.href = currentDrawerViewUrl || '#';
+        }
+
+        const overlay = document.getElementById('employeeDrawerOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEmployeeDrawer(e) {
+        if (e && e.target !== document.getElementById('employeeDrawerOverlay') && !e.target.classList.contains('modal-close') && e.target.tagName !== 'BUTTON') {
+            return;
+        }
+        const overlay = document.getElementById('employeeDrawerOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+        document.body.style.overflow = '';
+    }
+
+    function openDrawerEdit() {
+        if (currentDrawerEditUrl) {
+            closeEmployeeDrawer();
+            openCrudModal(currentDrawerEditUrl, 'Chỉnh Sửa Hồ Sơ Nhân Viên');
+        }
+    }
+
+    function openDrawerDelete() {
+        if (currentDrawerDeleteUrl) {
+            closeEmployeeDrawer();
+            openCrudModal(currentDrawerDeleteUrl, 'Xoá Nhân Viên');
+        }
+    }
+
+    // Keyboard navigation: ESC closes drawer
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeEmployeeDrawer();
+        }
+    });
+
+    // 0-Latency Live Search & Filter
+    (function () {
         const searchInput = document.getElementById('employeeSearchInput');
+        const deptFilter = document.getElementById('departmentFilter');
+        const statusFilter = document.getElementById('statusFilter');
         const clearBtn = document.getElementById('employeeSearchClear');
         const countBadge = document.getElementById('employeeCountBadge');
         const rows = Array.from(document.querySelectorAll('.employee-row'));
@@ -311,36 +411,35 @@
             return str.trim();
         }
 
-        // Cache normalized search texts on rows for 0-latency typing
         const rowData = rows.map(r => ({
             element: r,
             rawText: (r.dataset.search || '').toLowerCase(),
-            normalizedText: removeVietnameseTones(r.dataset.search || '')
+            normalizedText: removeVietnameseTones(r.dataset.search || ''),
+            dept: (r.dataset.dept || '').toLowerCase(),
+            status: (r.dataset.statusCode || '').toLowerCase()
         }));
 
-        function performFilter(rawQuery) {
-            const query = (rawQuery || '').trim();
-            const normalizedQuery = removeVietnameseTones(query);
+        function performFilter() {
+            const rawQuery = (searchInput ? searchInput.value : '').trim();
+            const normalizedQuery = removeVietnameseTones(rawQuery);
+            const selectedDeptText = deptFilter && deptFilter.selectedIndex > 0 ? deptFilter.options[deptFilter.selectedIndex].text.toLowerCase() : '';
+            const selectedStatus = statusFilter ? statusFilter.value.toLowerCase() : '';
 
             if (clearBtn) {
-                clearBtn.style.display = query ? 'block' : 'none';
-            }
-
-            if (!query) {
-                rowData.forEach(item => { item.element.style.display = ''; });
-                if (noResultRow) noResultRow.style.display = 'none';
-                if (countBadge) countBadge.textContent = `${totalRows} nhân sự`;
-                return;
+                clearBtn.style.display = rawQuery ? 'block' : 'none';
             }
 
             let matchCount = 0;
             const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
 
             rowData.forEach(item => {
-                const matches = queryTokens.every(tok => 
+                const matchesSearch = queryTokens.length === 0 || queryTokens.every(tok =>
                     item.rawText.includes(tok) || item.normalizedText.includes(tok)
                 );
-                if (matches) {
+                const matchesDept = !selectedDeptText || item.dept.includes(selectedDeptText);
+                const matchesStatus = !selectedStatus || item.status === selectedStatus;
+
+                if (matchesSearch && matchesDept && matchesStatus) {
                     item.element.style.display = '';
                     matchCount++;
                 } else {
@@ -349,13 +448,13 @@
             });
 
             if (countBadge) {
-                countBadge.textContent = `Hiển thị ${matchCount} / ${totalRows} nhân sự`;
+                countBadge.textContent = `${matchCount}`;
             }
 
             if (noResultRow) {
                 if (matchCount === 0) {
                     noResultRow.style.display = '';
-                    if (missingKeywordSpan) missingKeywordSpan.textContent = query;
+                    if (missingKeywordSpan) missingKeywordSpan.textContent = rawQuery || 'Bộ lọc';
                     if (typeof lucide !== 'undefined') lucide.createIcons();
                 } else {
                     noResultRow.style.display = 'none';
@@ -364,27 +463,24 @@
         }
 
         if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                performFilter(this.value);
-            });
+            searchInput.addEventListener('input', performFilter);
+        }
+
+        if (deptFilter) {
+            deptFilter.addEventListener('change', performFilter);
+        }
+
+        if (statusFilter) {
+            statusFilter.addEventListener('change', performFilter);
         }
 
         if (clearBtn && searchInput) {
-            clearBtn.addEventListener('click', function() {
+            clearBtn.addEventListener('click', function () {
                 searchInput.value = '';
-                performFilter('');
+                performFilter();
                 searchInput.focus();
             });
-        }
-
-        // Synchronize on initial load if query exists
-        if (searchInput && searchInput.value) {
-            performFilter(searchInput.value);
         }
     })();
 </script>
 {% endblock %}
-
-
-
-

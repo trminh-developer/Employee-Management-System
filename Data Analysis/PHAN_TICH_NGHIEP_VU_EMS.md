@@ -452,3 +452,60 @@ Tất cả các phòng ban chức năng còn lại trong doanh nghiệp (HR, Fin
 #### b) Giải pháp Kiến trúc Triệt để (Two-layer Architecture Fix)
 1. **Lớp Dữ liệu (Model-level Type Hinting):** Khai báo trực tiếp type annotations `id: int` và `pk: Any` trên toàn bộ 8 model nghiệp vụ ([`User`](file:///E:/Project/HeThongQuanLyNhanVien/apps/accounts/models.py#L4-L10), [`Employee`](file:///E:/Project/HeThongQuanLyNhanVien/apps/employees/models.py#L7-L12), [`Department`](file:///E:/Project/HeThongQuanLyNhanVien/apps/departments/models.py#L4-L10), [`Position`](file:///E:/Project/HeThongQuanLyNhanVien/apps/departments/models.py#L16-L20), [`LeaveRequest`](file:///E:/Project/HeThongQuanLyNhanVien/apps/leave/models.py#L6-L10), [`Attendance`](file:///E:/Project/HeThongQuanLyNhanVien/apps/attendance/models.py#L4-L8), [`Payroll`](file:///E:/Project/HeThongQuanLyNhanVien/apps/payroll/models.py#L4-L8), [`PerformanceReview`](file:///E:/Project/HeThongQuanLyNhanVien/apps/performance/models.py#L4-L8), [`Notification`](file:///E:/Project/HeThongQuanLyNhanVien/apps/notifications/models.py#L7-L11)). Do chỉ là Type Hint không gán giá trị, Django ORM bỏ qua và không tạo ra bất kỳ migration thừa nào.
 2. **Lớp Trình soạn thảo & Linter (Workspace Configuration):** Khởi tạo cấu hình chuẩn `.vscode/settings.json` và `pyrightconfig.json` với `reportAttributeAccessIssue: none` và `typeCheckingMode: basic`, giúp triệt tiêu hoàn toàn các cảnh báo giả, đồng thời kích hoạt tính năng gợi ý mã (Autocomplete / IntelliSense) mượt mà cho thuộc tính `.id` và `.pk`.
+
+---
+
+### 15. Hệ Thống Thử Nghiệm Giao Diện Độc Lập & Chuẩn Hóa Design System (Interactive UI Prototype & Design System)
+
+Nhằm đảm bảo chất lượng công thái học (Ergonomics), thẩm mỹ hiện đại và tính khả thi trước khi tích hợp trực tiếp vào các view/template của Django/FastAPI, hệ thống triển khai môi trường mẫu thử nghiệm độc lập tại thư mục [`prototype/`](file:///E:/Project/HeThongQuanLyNhanVien/prototype/) tuân thủ các chỉ dẫn thiết kế trong thư mục [`.agents/`](file:///E:/Project/HeThongQuanLyNhanVien/.agents/):
+
+#### a) Kiến trúc Design Tokens 3 Tầng (`.agents/skills/design-system`)
+- **Primitive Tokens:** Bảng màu gốc Slate, Indigo, Teal, Emerald, Amber, Rose; thang khoảng cách (`4px` đến `40px`) và bo góc (`6px` đến `24px`).
+- **Semantic Tokens:** Quy định rõ mục đích sử dụng cho cả 2 chế độ Sáng/Tối (`--bg-page`, `--bg-card`, `--brand-primary`, `--status-success`, `--status-warning`, `--status-danger`).
+- **Component Tokens:** Tối ưu hóa card bo góc 16px, nút bấm tương tác nhanh (180ms cubic-bezier), bảng dữ liệu mật độ cao (Data-dense table).
+
+#### b) Quy chuẩn UI/UX Pro Max (`.agents/skills/ui-ux-pro-max`)
+- Bố cục **Bento Box Grid** cho 4 khối chỉ số điều hành (KPIs): Tổng nhân sự, Tỷ lệ chấm công, Đơn phép chờ duyệt, Dự toán quỹ lương.
+- **Thanh tìm kiếm toàn cục (Command Palette `Ctrl + K`):** Lọc tức thì dữ liệu nhân viên, chức vụ, phòng ban và liên kết nhanh.
+- **Bảng điều khiển mô phỏng vai trò (Role Switcher Simulator):** Cho phép chuyển đổi tức thì giữa 4 vai trò `Admin`, `HR Leader`, `Manager`, và `Employee` để kiểm thử ma trận phân quyền và luồng duyệt nghỉ phép 2 cấp trực quan.
+- **Thanh trượt chi tiết (Slide-over Drawer) & Phiếu lương tương tác:** Xem hồ sơ nhân viên và chi tiết phiếu lương (Lương Gross, BHXH 10.5%, Thuế TNCN, Lương Net) ngay trên một trang duy nhất mà không bị tải lại trang.
+
+#### c) Tích hợp Chính Thức Vào Project (`frontend/templates/base.html` & `static/css/`)
+- **Tổ chức Điều Hướng Chuyên Nghiệp:** Phân chia danh mục Sidebar thành 4 phân hệ rõ ràng: *Tổng quan*, *Quản lý nhân sự*, *Tài chính & Hiệu suất*, và *Hệ thống & Quản trị*.
+- **Loại bỏ Widget Thử Nghiệm Tạm Thời:** Gỡ bỏ hoàn toàn hộp chọn mô phỏng vai trò (*RBAC Test Simulator*) khỏi Sidebar, chuyển giao trực tiếp sang thẻ hồ sơ định danh thu nhỏ (*User Profile Mini Footer*) bám sát phiên đăng nhập thực tế của người dùng (`request.user`).
+- **Bảo Toàn 100% Tính Năng Cốt Lõi:**
+  - **Phân hệ Thông Báo (`/notifications/`):** Tích hợp chuông thông báo trên Header và mục truy cập nhanh trên Sidebar.
+  - **Phân hệ Quản Lý Tài Khoản (`/accounts/users/`):** Bảo lưu phân quyền nghiêm ngặt dành riêng cho quản trị viên tối cao (`Admin`) để cấp phát, chỉnh sửa và quản lý tài khoản người dùng toàn hệ thống.
+- **Khắc phục Lỗi Tràn Viền Dropdown Menu Cá Nhân (Profile Dropdown Overflow Fix):**
+  - *Hiện tượng:* Email người dùng có độ dài lớn (ví dụ: `trminhithelpdesk@oulook.com`) bị lồi qua mép phải của khung dropdown và chạm mép màn hình do chiều rộng cố định `width: 200px` không đủ chứa chuỗi ký tự.
+  - *Giải pháp triệt để:* Nâng cấp `.dropdown-menu` với cơ chế co giãn linh hoạt (`min-width: 230px; max-width: min(290px, calc(100vw - 32px)); width: max-content; overflow: hidden;`), đồng thời bổ sung quy chuẩn cắt chuỗi tự động với dấu ba chấm (`text-overflow: ellipsis; white-space: nowrap;`) và tooltip `title` hiển thị đầy đủ thông tin khi rê chuột.
+- **Tích Hợp Trực Tiếp Vào Hệ Thống CSS Gốc (`design-system.css`, `components.css`, `layout.css`):**
+  - Thực hiện nguyên tắc tối ưu hóa cấu trúc dự án: Không phát sinh thêm file CSS trung gian (`prototype.css`), tích hợp toàn bộ chuẩn thiết kế mới trực tiếp vào 3 tập tin kiến trúc nền tảng hiện có.
+  - `design-system.css`: Hợp nhất toàn bộ tokens màu primitive (Slate, Indigo, Teal, Emerald, Amber, Rose), tokens ngữ nghĩa dark/light (`--brand-primary`, `--bg-card`, `--bg-subtle`, `--status-*-bg`), cùng hệ thang đo padding/radius/shadow đồng bộ.
+  - `components.css`: Chuẩn hóa toàn bộ bộ chọn form toàn diện (`input`, `select`, `textarea`, `.form-input`, `.form-select`, `.form-control`, `.input-field`) với viền mềm `var(--radius-md)`, hiệu ứng focus ring tím `rgba(79, 70, 229, 0.15)`, nút bấm công thái học (`.btn-primary`, `.btn-secondary`), bảng dữ liệu thẻ (`.data-table`, `.table-container`), bento grid, kpi card, tabs, modals và drawer.
+  - `layout.css`: Chuẩn hóa tiêu đề phân hệ (`.page-header`, `.page-title`, `.page-subtitle`), thanh bên, header và cơ chế hiển thị responsive thích ứng hoàn hảo cho mọi kích thước màn hình.
+
+#### d) Tích Hợp Toàn Diện Giao Diện Thực Tế Đạt Độ Tương Thích 80%+ Với Prototype
+Nhằm hiện thực hóa 80%+ trải nghiệm từ bản thử nghiệm `prototype/` vào hệ sinh thái ứng dụng Django/FastAPI thực tế mà không phát sinh thêm file CSS ngoài luồng:
+1. **Phân hệ Hồ Sơ Nhân Viên (`employees.html` & `views.py`):**
+   - **Thanh trượt thông tin Slide-over Drawer ("Hồ Sơ Chi Tiết Nhân Sự"):** Tích hợp hoàn hảo theo đúng thiết kế bản mẫu. Nhấp vào bất kỳ hàng nhân viên nào hoặc nút "Chi tiết" sẽ kích hoạt thanh trượt từ cạnh phải màn hình với hoạt họa mượt mà `0.3s cubic-bezier(0.16, 1, 0.3, 1)`.
+   - **Bố cục Thông tin Nhân viên Đầy đủ:** Hiển thị Avatar lớn 54px, Mã nhân viên định dạng mono (`TECH0001`, `0001`...), Nhãn trạng thái làm việc (Xanh lục), Lưới 4 ô chỉ số (Phòng ban, Chức vụ, Lương cơ bản nổi bật, Điểm KPI hiện tại), cùng mục chi tiết liên hệ và hợp đồng (Email, Điện thoại, Ngày vào làm, Quản lý trực tiếp).
+   - **Tối ưu hóa Truy vấn Cơ sở Dữ liệu:** Sử dụng `Subquery` và `OuterRef` trong `employees_list` để liên kết thông tin lương mới nhất (`latest_base_salary`) từ phân hệ Payroll và điểm đánh giá gần nhất (`latest_kpi_score`) từ phân hệ Performance mà không phát sinh thêm truy vấn N+1.
+   - **Thẻ Bao Bọc (`content-card`) & Thanh Công Cụ Đa Năng:** Tích hợp thanh tìm kiếm tức thì 0-latency hỗ trợ tiếng Việt không dấu, bộ lọc phòng ban, trạng thái và huy hiệu hiển thị số lượng nhân sự động.
+   - **Tối Giản Cột Hành Động (Action Column Clean-up):** Loại bỏ hoàn toàn liên kết `Sửa` dư thừa ở cột "HÀNH ĐỘNG" trên bảng dữ liệu danh sách để đồng bộ 100% với bản Prototype (chỉ duy trì nút `Chi tiết`). Toàn bộ quyền thao tác Chỉnh Sửa (`Chỉnh Sửa Hồ Sơ`) và Xóa (`Xoá Nhân Viên`) được đưa trực tiếp vào chân trang thanh trượt Slide-over Drawer, giúp giao diện bảng thoáng đãng, chuyên nghiệp và tránh thao tác nhầm lẫn.
+2. **Đồng Bộ Hóa Các Phân Hệ Khác (`departments.html`, `attendance.html`, `leave.html`, `payroll.html`):**
+   - Chuyển đổi toàn bộ cấu trúc bảng sang định dạng thẻ thống nhất (`content-card`, `table-responsive`, `data-table`).
+   - Sử dụng font monospace cho mã phòng ban, giờ chấm công (Check-in/Check-out), khoảng thời gian và số tiền lương thực nhận (Net salary).
+   - Duy trì toàn bộ phân quyền quản trị (Thêm, Sửa, Xóa) thông qua cơ chế Popup Modals an toàn `openCrudModal`.
+
+#### e) Chuẩn Hóa Kiến Trúc Hệ Thống & Tối Ưu Hóa Cấu Trúc Dự Án (Architecture Clean-up)
+Nhằm giữ cho cấu trúc dự án tinh gọn, đạt chuẩn enterprise và không bị phân mảnh:
+1. **Tập Trung Toàn Bộ Báo Cáo & Phân Tích Vào Thư Mục Data Analysis/:**
+   - Gom toàn bộ tài liệu nghiệp vụ, bản thiết kế cơ sở dữ liệu (EMS_Business_Analysis.md, EMS_Database_Design.md), biểu đồ luồng (EMS_DFD_Context.drawio, EMS_UseCase.drawio), báo cáo lỗi giao diện (UX_UI_Error_Report.xlsx), slide thuyết trình (Báo Cáo Đồ Án.pptx) và tài liệu phân tích hệ thống (PHAN_TICH_NGHIEP_VU_EMS.md).
+   - Lưu trữ tập trung các tài nguyên phân tích cơ sở dữ liệu và kịch bản xuất sơ đồ quan hệ: database_erd.png, database_relationships.csv, database_relationships.html, database_relationships.sql, export_erd_image.py, export_relationships.py, generate_ux_report.py.
+2. **Quy Hoạch Các Kịch Bản Bổ Trợ Vào Thư Mục scripts/:**
+   - Di chuyển các script di chuyển dữ liệu và gieo dữ liệu mẫu thực tế: migrate_to_sqlserver.py, seed_employees.py, seed_payroll.py, update_employee_ids.py.
+3. **Thanh Lọc Hoàn Toàn Tệp Tin Rác & Thư Mục Dư Thừa:**
+   - Loại bỏ các tệp nháp, bản vá tạm thời và log sinh ra trong quá trình phát triển (output.txt, dashboard_rendered.html, project_structure.txt, patch_admin.py, patch_base.py, ix_badges.py, create_models.py, create_performance.py, create_user_list.py, scaffold.py, setup_functions.py).
+   - Xóa bỏ các bản sao trùng lặp ngoài thư mục gốc (rontend/database_erd.png, rontend/database_relationships.html).
+   - Xóa bỏ toàn bộ thư mục sandbox tạm thời (prototype/, .agents/) sau khi đã hoàn tất hợp nhất mã nguồn vào hệ thống CSS/Template chuẩn của Django, ngăn ngừa phân mảnh kiến trúc.
