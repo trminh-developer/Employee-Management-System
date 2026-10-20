@@ -60,11 +60,11 @@
         {% if '_popup' not in request.GET %}
         <aside id="sidebar" class="sidebar" aria-label="Điều hướng chính">
             <div class="sidebar-header">
-                <a href="{% url 'dashboard' %}" class="sidebar-brand" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                    <img src="{% static 'images/logo-icon.png' %}" alt="TMNexora Logo" style="width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; border-radius: 8px;">
-                    <div style="display: flex; flex-direction: column; line-height: 1.15;">
-                        <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; color: var(--text-primary);">TMNexora</span>
-                        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;">Employee System</span>
+                <a href="{% url 'dashboard' %}" class="sidebar-brand">
+                    <img src="{% static 'images/logo-icon.png' %}" alt="TMNexora Logo" class="sidebar-brand-logo">
+                    <div class="sidebar-brand-text">
+                        <span class="brand-name">TMNexora</span>
+                        <span class="brand-sub">Employee System</span>
                     </div>
                 </a>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Đóng/Mở thanh bên">

@@ -20,30 +20,98 @@
 }
 
 .sidebar.collapsed {
-    width: 4rem;
+    width: 4.25rem;
 }
 
 .sidebar-header {
     height: 4rem;
     display: flex;
     align-items: center;
-    padding: 0 1.25rem;
+    padding: 0 1rem;
     border-bottom: 1px solid var(--border-color);
     justify-content: space-between;
+    transition: padding var(--transition-base);
 }
 
 .sidebar-brand {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--primary-600);
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    min-width: 0;
     overflow: hidden;
-    transition: opacity var(--transition-fast);
+    transition: all var(--transition-fast);
+}
+
+.sidebar-brand-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 8px;
+    display: block;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    white-space: nowrap;
+}
+
+.sidebar-brand-text .brand-name {
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.sidebar-brand-text .brand-sub {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* Collapsed state: keep logo visible! */
+.sidebar.collapsed .sidebar-header {
+    padding: 0 0.5rem;
+    justify-content: space-between;
 }
 
 .sidebar.collapsed .sidebar-brand {
+    display: flex !important;
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible;
+}
+
+.sidebar.collapsed .sidebar-brand-logo {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.sidebar.collapsed .sidebar-brand-text {
+    display: none !important;
     opacity: 0;
     width: 0;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+    padding: 2px !important;
+}
+
+.sidebar.collapsed .sidebar-toggle svg,
+.sidebar.collapsed .sidebar-toggle i {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 0.65rem 0;
 }
 
 .sidebar-toggle {
