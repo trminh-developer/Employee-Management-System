@@ -4,5 +4,5 @@ from .models import Department
 
 @login_required
 def departments_list(request):
-    departments = Department.objects.select_related('manager').all()
+    departments = Department.objects.select_related('manager', 'parent').all()
     return render(request, 'departments.html', {'departments': departments})
