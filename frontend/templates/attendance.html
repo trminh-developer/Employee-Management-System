@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Chấm công - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Lịch sử Chấm công - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Theo dõi lịch sử chấm công, giờ check-in/check-out, trạng thái đi muộn và số giờ làm thêm (OT) của nhân viên.{% endblock %}
+{% block og_title %}Lịch sử Chấm công - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -21,6 +23,7 @@
                 <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Giờ ra</th>
                 <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Trạng thái</th>
                 <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Làm thêm (Giờ)</th>
+                <th style="padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border-color);">Thao tác</th>
             </tr>
         </thead>
         <tbody>
@@ -32,21 +35,23 @@
                 <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.check_in|time:"H:i"|default:"-" }}</td>
                 <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.check_out|time:"H:i"|default:"-" }}</td>
                 <td style="padding: 16px 20px; color: var(--text-primary);">
-                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
-                    {% if rec.status == 'present' %}background:#c6f6d5;color:#22543d;
-                    {% elif rec.status == 'late' %}background:#feebc8;color:#7b341e;
-                    {% else %}background:#fed7d7;color:#9b2c2c;{% endif %}">
+                    <span class="badge {% if rec.status == 'present' %}badge-success{% elif rec.status == 'late' %}badge-warning{% else %}badge-danger{% endif %}">
                         {{ rec.get_status_display }}
                     </span>
                 </td>
                 <td style="padding: 16px 20px; color: var(--text-primary);">{{ rec.overtime_hours }}</td>
+                <td style="padding: 16px 20px; color: var(--text-primary);">
+                    <a href="#" onclick="openCrudModal('/admin/attendance/attendance/{{ rec.id }}/change/?_popup=1', 'Sửa Chấm công'); return false;" class="btn-action">Sửa</a>
+                    <a href="#" onclick="openCrudModal('/admin/attendance/attendance/{{ rec.id }}/delete/?_popup=1', 'Xóa Chấm công'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" style="text-align:center; padding: 30px; color: var(--text-secondary);">Chưa có dữ liệu chấm công.</td>
+                <td colspan="8" style="text-align:center; padding: 30px; color: var(--text-secondary);">Chưa có dữ liệu chấm công.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endblock %}
+
