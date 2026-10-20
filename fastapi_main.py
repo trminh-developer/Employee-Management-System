@@ -195,7 +195,7 @@ def _generate_next_employee_id(department, position) -> str:
     """Sinh mã nhân viên duy nhất theo đúng quy tắc nghiệp vụ, chống xung đột ID."""
     import re
     title = position.title.strip().lower() if position else ''
-    is_chairman = 'chủ tịch' in title
+    is_chairman = 'chủ tịch' in title and 'thư ký' not in title
 
     if is_chairman:
         existing_ids = Employee.objects.filter(employee_id__regex=r'^\d{4}$').values_list('employee_id', flat=True)
@@ -217,6 +217,9 @@ def _generate_next_employee_id(department, position) -> str:
         'Pháp chế': 'LEG',
         'Marketing': 'MKT',
         'R&D': 'RND',
+        'Hội Đồng Quản Trị': 'BOD',
+        'Ban Tổng Giám Đốc': 'BGD',
+        'Ban Giám Đốc': 'BGD',
     }
     dept_name = department.name if department else ''
     prefix = prefix_map.get(dept_name, 'API')

@@ -49,7 +49,7 @@ class Employee(models.Model):
         if self.employee_id:
             is_pure_number = bool(re.match(r'^\d{4}$', self.employee_id))
             title = self.position.title.strip().lower() if self.position else ''
-            is_chairman = 'chủ tịch' in title
+            is_chairman = 'chủ tịch' in title and 'thư ký' not in title
             
             if is_pure_number and not is_chairman:
                 raise ValidationError({'employee_id': "Chỉ có Chủ tịch hoặc Phó chủ tịch mới được phép dùng mã nhân viên chỉ gồm 4 chữ số (VD: 0001)."})
