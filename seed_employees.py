@@ -63,7 +63,7 @@ def create_dummy_data():
             import unidecode
             username_base = unidecode.unidecode(f"{first}{last}").lower().replace(' ', '')
             username = f"{username_base}{random.randint(1000, 99999)}"
-            email = f"{username}@company.com"
+            email = f"{username}@ems.com"
             
             user = User.objects.create(
                 username=username,
@@ -71,7 +71,7 @@ def create_dummy_data():
                 first_name=f"{last} {mid}",
                 last_name=first,
                 role='employee',
-                password=make_password('password123')
+                password=make_password('123456')
             )
             
             pos = random.choice(positions_by_dept[dept.id])
@@ -88,7 +88,7 @@ def create_dummy_data():
             
             Employee.objects.create(
                 user=user,
-                employee_id=f"EMP{start_id:04d}",
+                employee_id=f"{prefix_map.get(dept_name, 'EMP')}{start_id:04d}",
                 department=dept,
                 position=pos,
                 gender=gender,
@@ -105,3 +105,5 @@ def create_dummy_data():
 
 if __name__ == '__main__':
     create_dummy_data()
+
+
