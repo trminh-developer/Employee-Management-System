@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Bảng lương - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Quản lý Bảng lương - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Tổng hợp và quản lý bảng lương nhân viên theo kỳ, bao gồm lương cơ sở, phụ cấp, khấu trừ thuế và lương thực nhận.{% endblock %}
+{% block og_title %}Quản lý Bảng lương - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -30,15 +32,13 @@
                 <td style="padding: 16px 20px; color: var(--text-primary);">${{ rec.base_salary }}</td>
                 <td style="padding: 16px 20px; font-weight:bold; color: var(--success-600);">${{ rec.net_salary }}</td>
                 <td style="padding: 16px 20px;">
-                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
-                    {% if rec.status == 'paid' %}background:#c6f6d5;color:#22543d;
-                    {% elif rec.status == 'approved' %}background:#bee3f8;color:#2c5282;
-                    {% else %}background:#e2e8f0;color:#4a5568;{% endif %}">
+                    <span class="badge {% if rec.status == 'paid' %}badge-success{% elif rec.status == 'approved' %}badge-primary{% else %}badge-secondary{% endif %}">
                         {{ rec.get_status_display }}
                     </span>
                 </td>
                 <td style="padding: 16px 20px;">
-                    <a href="{% url 'admin:payroll_payroll_change' rec.id %}?next={{ request.path }}" style="color: var(--primary-500); text-decoration: none; font-weight: 600; margin-right: 10px;">Chi tiết</a>
+                    <a href="#" onclick="openCrudModal('/admin/payroll/payroll/{{ rec.id }}/change/?_popup=1', 'Sửa'); return false;" class="btn-action">Sửa</a>
+                    <a href="#" onclick="openCrudModal('/admin/payroll/payroll/{{ rec.id }}/delete/?_popup=1', 'Xóa'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
                 </td>
             </tr>
             {% empty %}
@@ -50,3 +50,8 @@
     </table>
 </div>
 {% endblock %}
+
+
+
+
+

@@ -1,7 +1,10 @@
+from typing import Any
 from django.db import models
 from apps.employees.models import Employee
 
 class Payroll(models.Model):
+    id: int
+    pk: Any
     STATUS_CHOICES = [
         ('draft', 'Draft'),
         ('calculated', 'Calculated'),
