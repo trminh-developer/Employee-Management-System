@@ -16,15 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dark Mode Toggle
     const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
+    const htmlElement = document.documentElement;
     
-    // Check local storage for theme
-    const currentTheme = localStorage.getItem('theme');
     const updateThemeIcon = () => {
         if (themeToggle) {
             const icon = themeToggle.querySelector('i');
             if (icon) {
-                if (body.classList.contains('dark-mode')) {
+                const currentTheme = htmlElement.getAttribute('data-theme') || 'light';
+                if (currentTheme === 'dark') {
                     icon.setAttribute('data-lucide', 'sun');
                 } else {
                     icon.setAttribute('data-lucide', 'moon');
@@ -34,20 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    if (currentTheme === 'dark') {
-        body.classList.add('dark-mode');
-    }
     updateThemeIcon();
 
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
+            const currentTheme = htmlElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             
-            let theme = 'light';
-            if (body.classList.contains('dark-mode')) {
-                theme = 'dark';
-            }
-            localStorage.setItem('theme', theme);
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
             updateThemeIcon();
         });
     }

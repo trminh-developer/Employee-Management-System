@@ -90,6 +90,19 @@
     color: var(--text-muted);
 }
 
+.btn-action {
+    color: var(--primary-500);
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: color var(--transition-fast);
+}
+.btn-action:hover {
+    color: var(--primary-600);
+    text-decoration: underline;
+}
+
 /* --- Cards --- */
 .card {
     background-color: var(--bg-surface);
@@ -186,9 +199,21 @@
     color: var(--danger-700);
 }
 
+.badge-primary {
+    background-color: var(--primary-50);
+    color: var(--primary-700);
+}
+
+.badge-secondary {
+    background-color: var(--neutral-100);
+    color: var(--neutral-700);
+}
+
 [data-theme='dark'] .badge-success { background-color: rgba(16, 185, 129, 0.2); color: var(--success-100); }
 [data-theme='dark'] .badge-warning { background-color: rgba(245, 158, 11, 0.2); color: var(--warning-100); }
 [data-theme='dark'] .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: var(--danger-100); }
+[data-theme='dark'] .badge-primary { background-color: rgba(99, 102, 241, 0.2); color: var(--primary-100); }
+[data-theme='dark'] .badge-secondary { background-color: rgba(148, 163, 184, 0.2); color: var(--neutral-300); }
 
 
 /* --- Modals --- */

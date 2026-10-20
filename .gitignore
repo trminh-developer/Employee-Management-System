@@ -23,5 +23,10 @@ ENV/
 # IDEs
 .vscode/
 .idea/
+.vs/
 *.swp
 *.swo
+
+# Office temporary files
+~$*
+

@@ -122,14 +122,32 @@
     overflow: hidden;
 }
 
+.user-profile-mini {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .sidebar.collapsed .user-info {
-    display: none;
+    display: none !important;
 }
 
 .sidebar.collapsed .user-profile-mini {
     justify-content: center;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    gap: 0 !important;
 }
 
 /* --- Main Content Area --- */
@@ -222,6 +240,10 @@
 .avatar {
     width: 2.25rem;
     height: 2.25rem;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    flex-shrink: 0;
+    overflow: hidden;
     border-radius: 50%;
     background-color: var(--primary-100);
     color: var(--primary-700);

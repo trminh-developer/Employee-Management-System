@@ -1,0 +1,15 @@
+{
+    "include": [
+        "apps",
+        "config",
+        "*.py"
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "**/.git"
+    ],
+    "reportAttributeAccessIssue": "none",
+    "reportOptionalMemberAccess": "none",
+    "reportGeneralTypeIssues": "none"
+}
