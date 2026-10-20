@@ -99,8 +99,7 @@ EMS.{% endblock %}
                         data-search="{{ emp.user.get_full_name }} {{ emp.user.username }} {{ emp.employee_id }} {{ emp.department.name|default:'' }} {{ emp.position.title|default:'' }} {{ emp.get_status_display }} {{ emp.user.email }} {{ emp.phone }}">
                         <td>
                             <span
-                                style="font-family: var(--font-mono); font-weight: 700; color: var(--brand-primary);">{{
-                                emp.employee_id }}</span>
+                                style="font-family: var(--font-mono); font-weight: 700; color: var(--brand-primary);">{{ emp.employee_id }}</span>
                         </td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 10px;">
@@ -111,12 +110,10 @@ EMS.{% endblock %}
                                         style="width: 100%; height: 100%; object-fit: cover;"
                                         alt="Avatar {{ emp.employee_id }}">
                                     {% else %}
-                                    {{ emp.user.first_name|slice:':1'|upper }}{{
-                                    emp.user.last_name|slice:':1'|upper|default:emp.user.username|slice:':2'|upper }}
+                                    {{ emp.user.first_name|slice:':1'|upper }}{{ emp.user.last_name|slice:':1'|upper|default:emp.user.username|slice:':2'|upper }}
                                     {% endif %}
                                 </div>
-                                <strong style="color: var(--text-primary);">{{
-                                    emp.user.get_full_name|default:emp.user.username }}</strong>
+                                <strong style="color: var(--text-primary);">{{ emp.user.get_full_name|default:emp.user.username }}</strong>
                             </div>
                         </td>
                         <td>{{ emp.department.name|default:"-" }}</td>
