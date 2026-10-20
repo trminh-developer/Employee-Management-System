@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "hr@yourcompany.com",
+        "fromEmail": "hr@ems.com",
         "toEmail": "={{ $json.body.user_email }}",
         "subject": "=[Hệ Thống HR] {{ $json.body.title }}",
         "text": "=Xin chào {{ $json.body.user_name }},\n\nBạn có một thông báo mới từ hệ thống nhân sự:\n\nTiêu đề: {{ $json.body.title }}\nMức độ: {{ $json.body.priority }}\nNội dung: {{ $json.body.message }}\n\nVui lòng đăng nhập vào hệ thống để xem chi tiết.\n\nTrân trọng,\nPhòng Nhân sự",
@@ -52,3 +52,4 @@
   "settings": {},
   "versionId": "1"
 }
+
