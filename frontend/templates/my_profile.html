@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Hồ sơ cá nhân - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Cập nhật thông tin liên hệ cá nhân, địa chỉ và ảnh đại diện nhân sự trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
+{% block og_title %}Hồ sơ cá nhân - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <div class="page-header" style="margin-bottom: 20px;">
@@ -24,12 +26,12 @@
         <div style="display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;">
             <!-- Avatar Section -->
             <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-                <div style="width: 150px; height: 150px; border-radius: 50%; background: var(--primary-50); border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                <div style="width: 150px; height: 150px; border-radius: 50%; background: var(--bg-body); border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
                     {% if employee.avatar %}
-                    <img src="{{ employee.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover;" id="avatarPreview">
+                    <img src="{{ employee.avatar.url }}" width="150" height="150" alt="Ảnh đại diện cá nhân" style="width: 100%; height: 100%; object-fit: cover;" id="avatarPreview">
                     {% else %}
                     <i data-lucide="user" style="width: 64px; height: 64px; color: var(--text-muted);" id="avatarIcon"></i>
-                    <img src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" id="avatarPreview">
+                    <img src="" width="150" height="150" alt="Xem trước ảnh đại diện" style="width: 100%; height: 100%; object-fit: cover; display: none;" id="avatarPreview">
                     {% endif %}
                 </div>
                 
@@ -92,3 +94,4 @@
     }
 </script>
 {% endblock %}
+
