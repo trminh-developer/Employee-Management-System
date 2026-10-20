@@ -1,7 +1,10 @@
+from typing import Any
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
+    id: int
+    pk: Any
     ROLE_CHOICES = [
         ('admin', 'Administrator'),
         ('hr', 'HR Manager'),
@@ -16,6 +19,14 @@ class User(AbstractUser):
         if self.role == 'admin':
             self.is_superuser = True
         super().save(*args, **kwargs)
+        try:
+            from apps.employees.models import Employee
+            if not self.is_active:
+                Employee.objects.filter(user_id=self.pk).exclude(status='inactive').update(status='inactive')
+            else:
+                Employee.objects.filter(user_id=self.pk, status='inactive').update(status='active')
+        except Exception:
+            pass
 
     def has_perm(self, perm, obj=None):
         if self.is_superuser or self.role == 'admin':

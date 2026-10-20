@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hồ sơ nhân viên {{ employee.employee_id }} - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Trang tra cứu thông tin công việc, phòng ban và lịch sử nghỉ phép của nhân sự mã {{ employee.employee_id }} trong hệ thống nội bộ.{% endblock %}
+{% block og_title %}Hồ sơ nhân viên {{ employee.employee_id }} - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Chi tiết nhân viên</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Hồ sơ thông tin nhân viên trong công ty.</p>
+    </div>
+    {% if '_popup' not in request.GET %}
+    <a href="{% url 'admin:employees_employee_change' employee.id %}?next={{ request.path }}" class="btn btn-primary" style="padding: 10px 20px; background: var(--primary-500); color: white; border: none; border-radius: 6px; text-decoration: none;">
+        <i data-lucide="edit"></i> Chỉnh sửa
+    </a>
+    {% endif %}
+</div>
+
+<div class="profile-header" style="display: flex; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+    <div class="profile-avatar-large" style="display:flex; align-items:center; justify-content:center; width:80px; height:80px; background:var(--primary-100); color:var(--primary-700); border-radius:50%; font-size:24px; font-weight:bold; overflow: hidden; flex-shrink: 0;">
+        {% if employee.avatar %}
+            <img src="{{ employee.avatar.url }}" width="80" height="80" alt="Ảnh đại diện nhân viên {{ employee.employee_id }}" style="width:100%; height:100%; border-radius:50%; object-fit: cover;" />
+        {% else %}
+            {{ employee.user.first_name|first|default:"U" }}{{ employee.user.last_name|first|default:"U" }}
+        {% endif %}
+    </div>
+    <div class="profile-title" style="margin-left: 20px;">
+        <h2 style="margin: 0; font-size: 24px; color: var(--text-primary);">{{ employee.user.get_full_name|default:employee.user.username }}</h2>
+        <p class="job-title" style="margin: 5px 0; color: var(--text-secondary); font-weight: 500;">{{ employee.position.title|default:"Chưa cập nhật chức vụ" }}</p>
+        <p class="department" style="margin: 0; color: var(--text-muted);">{{ employee.department.name|default:"Chưa phân bổ phòng ban" }}</p>
+    </div>
+</div>
+
+<div class="profile-tabs" style="margin-top: 20px; border-bottom: 1px solid var(--border-color);">
+    <nav class="tabs-nav" style="display: flex; gap: 20px;">
+        <a href="#personal" class="tab-link active" style="padding: 10px 0; text-decoration: none; color: var(--primary-500); border-bottom: 2px solid var(--primary-500); font-weight: 600;">Cá nhân</a>
+        <a href="#work" class="tab-link" style="padding: 10px 0; text-decoration: none; color: var(--text-secondary); font-weight: 500;">Công việc</a>
+        <a href="#attendance" class="tab-link" style="padding: 10px 0; text-decoration: none; color: var(--text-secondary); font-weight: 500;">Nghỉ phép</a>
+    </nav>
+</div>
+
+<div class="profile-content" style="margin-top: 20px;">
+    <!-- Personal Tab -->
+    <div id="personal" class="tab-pane active" style="display: block;">
+        <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Thư điện tử</label>
+                <p style="margin-top: 5px;">
+                    {% if employee.user.email %}
+                        <a href="mailto:{{ employee.user.email }}" style="color: var(--primary-500); text-decoration: none;">{{ employee.user.email }}</a>
+                    {% else %}
+                        <span style="color: var(--text-primary);">Chưa cập nhật</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Điện thoại</label>
+                <p style="margin-top: 5px;">
+                    {% if employee.phone %}
+                        <a href="tel:{{ employee.phone }}" style="color: var(--primary-500); text-decoration: none;">{{ employee.phone }}</a>
+                    {% else %}
+                        <span style="color: var(--text-primary);">Chưa cập nhật</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Ngày sinh</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.dob|date:"d/m/Y"|default:"Chưa cập nhật" }}</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Địa chỉ</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.address|default:"Chưa cập nhật" }}</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Giới tính</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.get_gender_display|default:"Chưa cập nhật" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Work Tab -->
+    <div id="work" class="tab-pane" style="display: none;">
+        <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Ngày vào làm</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.join_date|date:"d/m/Y"|default:"Chưa cập nhật" }}</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Quản lý trực tiếp</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.manager.user.get_full_name|default:"Không có" }}</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Mã Nhân Viên</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.employee_id }}</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Trạng thái</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">{{ employee.get_status_display }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance/Leave Tab -->
+    <div id="attendance" class="tab-pane" style="display: none;">
+        <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--bg-surface); padding: 24px; border-radius: 10px; border: 1px solid var(--border-color);">
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Phép năm còn lại</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">12 Ngày</p>
+            </div>
+            <div class="info-group">
+                <label style="font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">Phép bệnh còn lại</label>
+                <p style="margin-top: 5px; color: var(--text-primary);">5 Ngày</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active classes
+                tabLinks.forEach(l => {
+                    l.classList.remove('active');
+                    l.style.color = 'var(--text-secondary)';
+                    l.style.borderBottom = 'none';
+                });
+                
+                tabPanes.forEach(p => {
+                    p.classList.remove('active');
+                    p.style.display = 'none';
+                });
+
+                // Add active to clicked
+                this.classList.add('active');
+                this.style.color = 'var(--primary-500)';
+                this.style.borderBottom = '2px solid var(--primary-500)';
+
+                // Show corresponding pane
+                const targetId = this.getAttribute('href').substring(1);
+                const targetPane = document.getElementById(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                    targetPane.style.display = 'block';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

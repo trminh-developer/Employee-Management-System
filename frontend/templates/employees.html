@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% block title %}Danh sách Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Quản lý danh sách hồ sơ nhân viên, tra cứu theo phòng ban, chức vụ và trạng thái làm việc trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
+{% block og_title %}Danh sách Nhân viên - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+
+{% block content %}
+<style>
+/* Toolbar Styling */
+.employee-workspace .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: var(--bg-surface);
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.employee-workspace .search-box, 
+.employee-workspace .filters, 
+.employee-workspace .view-toggle {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.employee-workspace .form-input, 
+.employee-workspace .form-select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.employee-workspace .form-input:focus, 
+.employee-workspace .form-select:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+}
+
+.employee-workspace .btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.employee-workspace .btn-primary {
+    background: var(--primary-500);
+    color: white;
+}
+.employee-workspace .btn-primary:hover {
+    background: var(--primary-600);
+}
+
+.employee-workspace .btn-secondary {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+.employee-workspace .btn-secondary:hover {
+    background: var(--bg-surface-alt);
+}
+
+@media (max-width: 768px) {
+    .employee-workspace .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .employee-workspace .search-box {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+    }
+    .employee-workspace .search-box input {
+        flex: 1;
+    }
+    .employee-workspace .filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .employee-workspace .filters select,
+    .employee-workspace .filters button,
+    .employee-workspace .filters a {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    .employee-workspace .filters a#addNew {
+        grid-column: span 2;
+        text-align: center;
+    }
+}
+
+/* Table Styling */
+.table-container {
+    background: var(--bg-surface);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+.data-table th {
+    background-color: var(--bg-surface-alt);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-surface-alt);
+}
+
+/* UI Elements */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-100);
+    color: var(--primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+
+
+</style>
+
+<div class="employee-workspace">
+    <div class="page-header" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <h1 style="margin: 0;">Danh sách Nhân viên</h1>
+            <span id="employeeCountBadge" style="font-size: 13px; font-weight: 600; padding: 4px 12px; background: var(--primary-50); color: var(--primary-700); border: 1px solid var(--primary-200); border-radius: 20px;">
+                {{ employees|length }} nhân sự
+            </span>
+        </div>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Tra cứu và quản lý hồ sơ nhân sự toàn công ty. Tự động hiển thị theo từ khóa tìm kiếm.</p>
+    </div>
+    <form method="GET" class="toolbar" id="employeeSearchForm">
+        <div class="search-box" style="position: relative; flex: 1; max-width: 480px; min-width: 260px;">
+            <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;"></i>
+            <input type="text" id="employeeSearchInput" name="q" value="{{ search_query }}" 
+                   placeholder="Tìm nhanh bất kỳ (tên, mã NV, chức vụ, phòng ban, vai trò, email, SĐT)..." 
+                   class="form-input" style="padding-left: 36px; padding-right: 36px; width: 100%;" autocomplete="off">
+            <button type="button" id="employeeSearchClear" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: {% if search_query %}block{% else %}none{% endif %}; font-size: 14px;" title="Xóa tìm kiếm">✕</button>
+        </div>
+        <button type="submit" class="btn btn-primary" style="white-space: nowrap;">Tìm kiếm</button>
+        <div class="filters">
+            <select name="department" class="form-select">
+                <option value="">Tất cả phòng ban</option>
+                {% for d in departments %}
+                <option value="{{ d.id }}" {% if request.GET.department == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Đang làm việc</option>
+                <option value="on_leave" {% if request.GET.status == 'on_leave' %}selected{% endif %}>Nghỉ phép</option>
+                <option value="remote" {% if request.GET.status == 'remote' %}selected{% endif %}>Làm từ xa</option>
+                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Đã nghỉ việc</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Lọc</button>
+            {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+            <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/employees/employee/add/?_popup=1', 'Thêm Nhân viên mới'); return false;">+ Thêm mới</button>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Họ Tên</th>
+                    <th>Phòng ban</th>
+                    <th>Chức vụ</th>
+                    <th>Trạng thái</th>
+                    <th>Đánh giá</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr class="employee-row" data-search="{{ emp.user.get_full_name }} {{ emp.user.username }} {{ emp.employee_id }} {{ emp.department.name|default:'' }} {{ emp.position.title|default:'' }} {{ emp.get_status_display }} {{ emp.user.email }} {{ emp.user.get_role_display }} {{ emp.phone }}">
+                    <td>
+                        <div class="avatar" style="overflow: hidden;">
+                            {% if emp.avatar %}
+                                <img src="{{ emp.avatar.url }}" width="40" height="40" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" alt="Ảnh đại diện nhân viên {{ emp.employee_id }}">
+                            {% else %}
+                                {{ emp.user.first_name|slice:":1" }}{{ emp.user.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ emp.user.get_full_name }}</strong><br>
+                        <small style="color:var(--text-secondary)">{{ emp.employee_id }}</small>
+                    </td>
+                    <td>{{ emp.department.name|default:"-" }}</td>
+                    <td>{{ emp.position.title|default:"-" }}</td>
+                    <td>
+                        <span class="badge {% if emp.status == 'active' %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ emp.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'performance:list' %}?employee={{ emp.id }}" style="text-decoration: none; display:flex; gap: 2px;" title="Xem các đánh giá của {{ emp.user.get_full_name }}">
+                            <span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#ecc94b">★</span><span style="color:#e2e8f0">★</span>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'employees:profile' emp.id %}" class="btn-action">Xem</a>
+                        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+                        <a href="#" onclick="openCrudModal('/admin/employees/employee/{{ emp.id }}/change/?_popup=1', 'Sửa Nhân viên'); return false;" class="btn-action">Sửa</a>
+                        <a href="#" onclick="openCrudModal('/admin/employees/employee/{{ emp.id }}/delete/?_popup=1', 'Xóa Nhân viên'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="emptyDbRow">
+                    <td colspan="7" style="text-align:center; padding: 30px; color: var(--text-secondary);">
+                        Không tìm thấy nhân viên nào trong hệ thống.
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- Dynamic Empty State for live instant search filter -->
+                <tr id="liveNoResultRow" style="display: none;">
+                    <td colspan="7" style="text-align: center; padding: 36px 20px; color: var(--text-secondary);">
+                        <div style="width: 44px; height: 44px; margin: 0 auto 10px; border-radius: 50%; background: var(--bg-surface-alt); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="search-x" style="width: 22px; height: 22px; color: var(--text-muted);"></i>
+                        </div>
+                        <div style="font-weight: 600; font-size: 14.5px; margin-bottom: 4px; color: var(--text-primary);">
+                            Không tìm thấy nhân sự phù hợp với từ khóa "<span id="missingKeywordText"></span>"
+                        </div>
+                        <small style="color: var(--text-muted); font-size: 12.5px;">Hãy thử tìm theo tên, tên đăng nhập, mã nhân viên (VD: 0001, ADM...), chức vụ hoặc tên phòng ban.</small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        const searchInput = document.getElementById('employeeSearchInput');
+        const clearBtn = document.getElementById('employeeSearchClear');
+        const countBadge = document.getElementById('employeeCountBadge');
+        const rows = Array.from(document.querySelectorAll('.employee-row'));
+        const noResultRow = document.getElementById('liveNoResultRow');
+        const missingKeywordSpan = document.getElementById('missingKeywordText');
+        const totalRows = rows.length;
+
+        function removeVietnameseTones(str) {
+            if (!str) return '';
+            str = str.toLowerCase();
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+            str = str.replace(/đ/g, "d");
+            str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+            str = str.replace(/\u02C6|\u0306|\u031B/g, "");
+            return str.trim();
+        }
+
+        // Cache normalized search texts on rows for 0-latency typing
+        const rowData = rows.map(r => ({
+            element: r,
+            rawText: (r.dataset.search || '').toLowerCase(),
+            normalizedText: removeVietnameseTones(r.dataset.search || '')
+        }));
+
+        function performFilter(rawQuery) {
+            const query = (rawQuery || '').trim();
+            const normalizedQuery = removeVietnameseTones(query);
+
+            if (clearBtn) {
+                clearBtn.style.display = query ? 'block' : 'none';
+            }
+
+            if (!query) {
+                rowData.forEach(item => { item.element.style.display = ''; });
+                if (noResultRow) noResultRow.style.display = 'none';
+                if (countBadge) countBadge.textContent = `${totalRows} nhân sự`;
+                return;
+            }
+
+            let matchCount = 0;
+            const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+
+            rowData.forEach(item => {
+                const matches = queryTokens.every(tok => 
+                    item.rawText.includes(tok) || item.normalizedText.includes(tok)
+                );
+                if (matches) {
+                    item.element.style.display = '';
+                    matchCount++;
+                } else {
+                    item.element.style.display = 'none';
+                }
+            });
+
+            if (countBadge) {
+                countBadge.textContent = `Hiển thị ${matchCount} / ${totalRows} nhân sự`;
+            }
+
+            if (noResultRow) {
+                if (matchCount === 0) {
+                    noResultRow.style.display = '';
+                    if (missingKeywordSpan) missingKeywordSpan.textContent = query;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                } else {
+                    noResultRow.style.display = 'none';
+                }
+            }
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                performFilter(this.value);
+            });
+        }
+
+        if (clearBtn && searchInput) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                performFilter('');
+                searchInput.focus();
+            });
+        }
+
+        // Synchronize on initial load if query exists
+        if (searchInput && searchInput.value) {
+            performFilter(searchInput.value);
+        }
+    })();
+</script>
+{% endblock %}
+
+
+
+

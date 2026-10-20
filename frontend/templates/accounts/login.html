@@ -1,0 +1,110 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Hệ Thống Quản Lý Nhân Sự (EMS)</title>
+    <meta name="description" content="Cổng đăng nhập Hệ Thống Quản Lý Nhân Sự (EMS Platform) - Quản trị hồ sơ nhân viên, chấm công, nghỉ phép, bảng lương và đánh giá KPI doanh nghiệp." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:title" content="Đăng nhập - Hệ Thống Quản Lý Nhân Sự (EMS)" />
+    <meta property="og:description" content="Cổng đăng nhập Hệ Thống Quản Lý Nhân Sự (EMS Platform) dành cho doanh nghiệp." />
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:login' %}" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/components.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "EMS Platform - Hệ Thống Quản Lý Nhân Sự",
+      "url": "{{ request.scheme }}://{{ request.get_host }}/",
+      "inLanguage": "vi-VN",
+      "publisher": {
+        "@type": "Organization",
+        "name": "EMS Enterprise HR Portal"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div class="login-split">
+      <div class="login-left">
+        <div class="login-brand">
+          <h1>EMS Platform</h1>
+          <p>Employee Intelligence & Data-driven HR Management System.</p>
+        </div>
+      </div>
+
+      <div class="login-right">
+        <div class="login-form-container">
+          <div class="login-header">
+            <h2>Welcome back</h2>
+            <p>Please enter your details to sign in.</p>
+          </div>
+
+          {% if form.errors %}
+          <div class="error-message">
+            Invalid username or password. Please try again.
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label for="id_username" class="form-label">Username</label>
+              <input
+                type="text"
+                name="username"
+                id="id_username"
+                class="form-control"
+                placeholder="Enter your username"
+                required
+                autofocus
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="id_password" class="form-label">Password</label>
+              <input
+                type="password"
+                name="password"
+                id="id_password"
+                class="form-control"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <div class="form-check">
+              <input type="checkbox" id="remember" name="remember" />
+              <label
+                for="remember"
+                style="font-size: 0.875rem; color: var(--text-secondary)"
+                >Remember me</label
+              >
+            </div>
+
+            <button type="submit" class="btn-login">Sign In</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

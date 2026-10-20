@@ -22,24 +22,39 @@ class EmployeeAdminForm(forms.ModelForm):
             self.fields['email'].initial = self.instance.user.email
             self.fields['role'].initial = self.instance.user.role
 
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip()
+        user_obj = self.cleaned_data.get('user') or (self.instance.user if self.instance and self.instance.pk else None)
+        if email:
+            qs = User.objects.filter(email=email)
+            if user_obj:
+                qs = qs.exclude(pk=user_obj.pk)
+            if qs.exists():
+                raise forms.ValidationError("Email này đã được sử dụng bởi một tài khoản khác.")
+        return email
+
     def save(self, commit=True):
-        employee = super().save(commit=False)
-        if commit:
-            employee.save()
-            self.save_m2m()
-            
-        if employee.user:
-            employee.user.first_name = self.cleaned_data.get('first_name', '')
-            employee.user.last_name = self.cleaned_data.get('last_name', '')
-            employee.user.email = self.cleaned_data.get('email', '')
-            
-            # Update role if provided
-            role_val = self.cleaned_data.get('role')
-            if role_val:
-                employee.user.role = role_val
+        from django.db import transaction
+        with transaction.atomic():
+            employee = super().save(commit=False)
+            if commit:
+                employee.save()
+                self.save_m2m()
                 
-            employee.user.save()
-        return employee
+            if employee.user:
+                employee.user.first_name = (self.cleaned_data.get('first_name') or '').strip()
+                employee.user.last_name = (self.cleaned_data.get('last_name') or '').strip()
+                email_val = (self.cleaned_data.get('email') or '').strip()
+                if email_val:
+                    employee.user.email = email_val
+                
+                # Update role if provided
+                role_val = self.cleaned_data.get('role')
+                if role_val:
+                    employee.user.role = role_val
+                    
+                employee.user.save()
+            return employee
 
 class FrontendRedirectMixin:
     def response_change(self, request, obj):

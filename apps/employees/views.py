@@ -16,11 +16,20 @@ def employees_list(request):
         from django.db.models.functions import Concat
         from django.db.models import Value
         employees = employees.annotate(
-            full_name=Concat('user__first_name', Value(' '), 'user__last_name')
+            full_name_vn=Concat('user__last_name', Value(' '), 'user__first_name'),
+            full_name_en=Concat('user__first_name', Value(' '), 'user__last_name')
         ).filter(
-            Q(full_name__icontains=search_query) | 
+            Q(full_name_vn__icontains=search_query) |
+            Q(full_name_en__icontains=search_query) |
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(user__username__icontains=search_query) |
+            Q(user__role__icontains=search_query) |
             Q(employee_id__icontains=search_query) |
-            Q(user__email__icontains=search_query)
+            Q(user__email__icontains=search_query) |
+            Q(department__name__icontains=search_query) |
+            Q(position__title__icontains=search_query) |
+            Q(phone__icontains=search_query)
         )
     
     if department_id:
@@ -45,7 +54,7 @@ def employees_list(request):
 
 @login_required
 def profile(request, id):
-    employee = get_object_or_404(Employee.objects.select_related('user', 'department', 'position'), id=id)
+    employee = get_object_or_404(Employee.objects.select_related('user', 'department', 'position', 'manager__user'), id=id)
     return render(request, 'employee_profile.html', {'employee': employee})
 
 from django.db.models import Count, Sum
@@ -85,39 +94,68 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.db import transaction
+from django.http import JsonResponse
+from apps.accounts.models import User
 import datetime
 
 @login_required
 def my_profile(request):
     user = request.user
     
-    try:
-        employee = user.employee_profile
-    except Employee.DoesNotExist:
-        employee = Employee.objects.create(
-            user=user, 
-            employee_id=f"EMP-ADMIN-{user.id}", 
-            join_date=datetime.date.today()
+    with transaction.atomic():
+        employee, _ = Employee.objects.get_or_create(
+            user=user,
+            defaults={
+                'employee_id': f"ADM{user.id:04d}",
+                'join_date': datetime.date.today(),
+                'phone': '0000000000'
+            }
         )
         
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name', '')
-        user.last_name = request.POST.get('last_name', '')
-        user.email = request.POST.get('email', '')
-        user.save()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
         
-        if 'avatar' in request.FILES:
-            employee.avatar = request.FILES['avatar']
-            employee.save()
+        if email and User.objects.filter(email=email).exclude(id=user.id).exists():
+            messages.error(request, "Email này đã được sử dụng bởi một tài khoản khác!")
+            return redirect('employees:my_profile')
             
+        with transaction.atomic():
+            user.first_name = first_name
+            user.last_name = last_name
+            if email:
+                user.email = email
+            user.save()
+            
+            if 'avatar' in request.FILES:
+                employee.avatar = request.FILES['avatar']
+                employee.save()
+                
         messages.success(request, "Hồ sơ đã được cập nhật thành công!")
         return redirect('employees:my_profile')
         
     return render(request, 'my_profile.html', {'employee': employee, 'user': user})
-from django.http import JsonResponse
 
 def api_employees(request):
-    employees = Employee.objects.select_related('user', 'department', 'position').all()[:50]
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'detail': 'Yêu cầu đăng nhập để truy cập dữ liệu.'}, status=401)
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'detail': 'Method not allowed'}, status=405)
+
+    qs = Employee.objects.select_related('user', 'department', 'position').exclude(status='inactive').filter(user__is_active=True).order_by('id')
+    user_role = getattr(request.user, 'role', 'employee')
+    if user_role == 'employee':
+        qs = qs.filter(user=request.user)
+    elif user_role == 'manager':
+        mgr_emp = Employee.objects.filter(user=request.user).first()
+        if mgr_emp and mgr_emp.department_id:
+            qs = qs.filter(Q(department_id=mgr_emp.department_id) | Q(department__manager=request.user) | Q(user=request.user))
+        else:
+            qs = qs.filter(Q(department__manager=request.user) | Q(user=request.user))
+
+    employees = qs[:50]
     data = []
     for emp in employees:
         data.append({
@@ -131,3 +169,98 @@ def api_employees(request):
             'status': emp.status
         })
     return JsonResponse({'status': 'success', 'count': len(data), 'data': data})
+
+
+@login_required
+def global_search(request):
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse({
+            'status': 'success',
+            'query': '',
+            'employees': [],
+            'departments': [],
+            'quick_links': []
+        })
+
+    from django.db.models.functions import Concat
+    from django.db.models import Value
+    from django.urls import reverse
+
+    # 1. Search employees (comprehensive)
+    emp_qs = Employee.objects.select_related('user', 'department', 'position').annotate(
+        full_name_vn=Concat('user__last_name', Value(' '), 'user__first_name'),
+        full_name_en=Concat('user__first_name', Value(' '), 'user__last_name')
+    ).filter(
+        Q(full_name_vn__icontains=q) |
+        Q(full_name_en__icontains=q) |
+        Q(user__first_name__icontains=q) |
+        Q(user__last_name__icontains=q) |
+        Q(user__username__icontains=q) |
+        Q(user__role__icontains=q) |
+        Q(employee_id__icontains=q) |
+        Q(user__email__icontains=q) |
+        Q(department__name__icontains=q) |
+        Q(position__title__icontains=q) |
+        Q(phone__icontains=q)
+    )[:8]
+
+    employees_data = []
+    for e in emp_qs:
+        name = e.user.get_full_name() if e.user else e.employee_id
+        if not name.strip():
+            name = e.user.username if e.user else e.employee_id
+        employees_data.append({
+            'id': e.id,
+            'name': name,
+            'username': e.user.username if e.user else '',
+            'role': e.user.get_role_display() if e.user else '',
+            'employee_id': e.employee_id,
+            'department': e.department.name if e.department else 'Chưa phân bổ',
+            'position': e.position.title if e.position else 'Chưa có chức vụ',
+            'avatar_url': e.avatar.url if e.avatar else '',
+            'initials': ((e.user.first_name[:1] if e.user and e.user.first_name else '') + (e.user.last_name[:1] if e.user and e.user.last_name else '')).upper() or 'NV',
+            'url': reverse('employees:profile', args=[e.id])
+        })
+
+    # 2. Search departments
+    dept_qs = Department.objects.filter(
+        Q(name__icontains=q) | Q(description__icontains=q)
+    )[:4]
+    departments_data = []
+    for d in dept_qs:
+        departments_data.append({
+            'id': d.id,
+            'name': d.name,
+            'count': d.employees.count(),
+            'manager': d.manager.get_full_name() if d.manager else 'Chưa phân công',
+            'url': reverse('employees:list') + f'?department={d.id}'
+        })
+
+    # 3. System quick links
+    all_links = [
+        {'title': 'Danh sách Nhân viên', 'url': reverse('employees:list'), 'icon': 'users', 'keywords': 'nhan vien employee danh sach nhan su danh ba'},
+        {'title': 'Danh sách Phòng ban', 'url': reverse('departments:list'), 'icon': 'network', 'keywords': 'phong ban department co cau to chuc phong ban'},
+        {'title': 'Lịch sử Chấm công', 'url': reverse('attendance:list'), 'icon': 'clock', 'keywords': 'cham cong attendance diem danh gio vao ra ca lam'},
+        {'title': 'Đơn xin nghỉ phép', 'url': reverse('leave:list'), 'icon': 'calendar-off', 'keywords': 'nghi phep leave don phep xin nghi nghi om nghi thai san'},
+        {'title': 'Quản lý Bảng lương', 'url': reverse('payroll:list'), 'icon': 'banknote', 'keywords': 'bang luong payroll tien luong luong thang thu nhap thue'},
+        {'title': 'Đánh giá hiệu suất KPI', 'url': reverse('performance:list'), 'icon': 'trending-up', 'keywords': 'danh gia performance kpi nang luc xep loai'},
+        {'title': 'Báo cáo & Phân tích', 'url': reverse('reports:list'), 'icon': 'pie-chart', 'keywords': 'bao cao reports thong ke phan tich bieu do'},
+        {'title': 'Trung tâm Thông báo', 'url': reverse('notifications:list'), 'icon': 'bell', 'keywords': 'thong bao notifications tin nhan canh bao'},
+        {'title': 'Hồ sơ cá nhân', 'url': reverse('employees:my_profile'), 'icon': 'user', 'keywords': 'ho so ca nhan my profile thong tin tai khoan'},
+    ]
+    matched_links = []
+    q_lower = q.lower()
+    for link in all_links:
+        if q_lower in link['title'].lower() or q_lower in link['keywords']:
+            matched_links.append(link)
+
+    return JsonResponse({
+        'status': 'success',
+        'query': q,
+        'total_results': len(employees_data) + len(departments_data) + len(matched_links),
+        'employees': employees_data,
+        'departments': departments_data,
+        'quick_links': matched_links[:4]
+    })
+
