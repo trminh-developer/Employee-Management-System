@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Đơn xin nghỉ phép - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Quản lý Đơn xin nghỉ phép - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Quản lý, tạo mới và phê duyệt đơn xin nghỉ phép năm, nghỉ ốm, nghỉ không lương của nhân sự trong công ty.{% endblock %}
+{% block og_title %}Quản lý Đơn xin nghỉ phép - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <div class="page-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -30,15 +32,13 @@
                 <td style="padding: 16px 20px; color: var(--text-primary);">{{ req.start_date|date:"d/m/Y" }} - {{ req.end_date|date:"d/m/Y" }}</td>
                 <td style="padding: 16px 20px; color: var(--text-primary);">{{ req.duration_days }}</td>
                 <td style="padding: 16px 20px;">
-                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; 
-                    {% if req.status == 'approved' %}background:#c6f6d5;color:#22543d;
-                    {% elif req.status == 'rejected' %}background:#fed7d7;color:#9b2c2c;
-                    {% else %}background:#e2e8f0;color:#4a5568;{% endif %}">
+                    <span class="badge {% if req.status == 'approved' %}badge-success{% elif req.status == 'rejected' %}badge-danger{% else %}badge-secondary{% endif %}">
                         {{ req.get_status_display }}
                     </span>
                 </td>
                 <td style="padding: 16px 20px;">
-                    <a href="{% url 'admin:leave_leaverequest_change' req.id %}?next={{ request.path }}" style="color: var(--primary-500); text-decoration: none; font-weight: 600; margin-right: 10px;">Duyệt đơn</a>
+                    <a href="#" onclick="openCrudModal('/admin/leave/leaverequest/{{ req.id }}/change/?_popup=1', 'Sửa Đơn phép'); return false;" class="btn-action">Sửa</a>
+                    <a href="#" onclick="openCrudModal('/admin/leave/leaverequest/{{ req.id }}/delete/?_popup=1', 'Xóa Đơn phép'); return false;" class="btn-action" style="color: var(--danger-500);">Xóa</a>
                 </td>
             </tr>
             {% empty %}
@@ -50,3 +50,5 @@
     </table>
 </div>
 {% endblock %}
+
+

@@ -1,7 +1,12 @@
+from typing import Any
 from django.db import models
+from django.core.exceptions import ValidationError
 from apps.employees.models import Employee
 
+
 class LeaveRequest(models.Model):
+    id: int
+    pk: Any
     TYPE_CHOICES = [
         ('annual', 'Annual Leave'),
         ('sick', 'Sick Leave'),
@@ -26,12 +31,20 @@ class LeaveRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def clean(self):
+        super().clean()
         if self.start_date and self.end_date:
-            if not self.duration_days:
-                # simple calculation for now
-                self.duration_days = (self.end_date - self.start_date).days + 1
+            if self.end_date < self.start_date:
+                raise ValidationError({
+                    'end_date': 'Ngày kết thúc nghỉ phép không được nhỏ hơn ngày bắt đầu.'
+                })
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        if self.start_date and self.end_date:
+            self.duration_days = (self.end_date - self.start_date).days + 1
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Leave {self.employee.user.username} - {self.start_date}"
+
