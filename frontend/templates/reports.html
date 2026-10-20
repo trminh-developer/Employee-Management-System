@@ -1,33 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Báo cáo & Phân tích - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Báo cáo & Phân tích Nhân sự - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block meta_description %}Báo cáo thống kê chuyên sâu về cơ cấu nhân sự, tỷ lệ biến động nhân viên và phân bổ quỹ lương theo từng phòng ban.{% endblock %}
+{% block og_title %}Báo cáo & Phân tích Nhân sự - Hệ Thống Quản Lý Nhân Sự{% endblock %}
 
 {% block content %}
 <style>
-    /* Design System Variables */
-    :root {
-        --color-primary: #4f46e5;
-        --color-primary-hover: #4338ca;
-        --color-success: #10b981;
-        --color-warning: #f59e0b;
-        --color-danger: #ef4444;
-        --color-surface: #ffffff;
-        --color-background: #f8fafc;
-        --color-text-main: #0f172a;
-        --color-text-muted: #64748b;
-        --color-border: #e2e8f0;
-        --radius-lg: 16px;
-        --radius-md: 12px;
-        --radius-sm: 8px;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --transition: all 0.2s ease-in-out;
-    }
-
-    body {
-        background-color: var(--color-background);
-        color: var(--color-text-main);
-    }
-
     /* Page Header */
     .report-header {
         display: flex;
@@ -42,12 +19,12 @@
         font-size: 24px;
         font-weight: 700;
         margin: 0 0 4px 0;
-        color: var(--color-text-main);
+        color: var(--text-primary);
     }
 
     .report-title p {
         margin: 0;
-        color: var(--color-text-muted);
+        color: var(--text-secondary);
         font-size: 14px;
     }
 
@@ -58,17 +35,17 @@
 
     .btn-outline {
         padding: 8px 16px;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
         border-radius: var(--radius-sm);
-        color: var(--color-text-main);
+        color: var(--text-primary);
         font-weight: 500;
         font-size: 14px;
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: var(--transition);
+        transition: var(--transition-base);
         text-decoration: none;
     }
 
@@ -79,9 +56,9 @@
 
     /* Controls Panel */
     .control-panel {
-        background: var(--color-surface);
+        background: var(--bg-surface);
         border-radius: var(--radius-md);
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--border-color);
         padding: 20px;
         margin-bottom: 24px;
         box-shadow: var(--shadow-sm);
@@ -91,7 +68,7 @@
         font-size: 14px;
         font-weight: 600;
         margin: 0 0 16px 0;
-        color: var(--color-text-main);
+        color: var(--text-primary);
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
@@ -111,23 +88,23 @@
 
     .filter-group label {
         font-size: 13px;
-        color: var(--color-text-muted);
+        color: var(--text-secondary);
         font-weight: 500;
     }
 
     .filter-group select {
         padding: 8px 12px;
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--border-color);
         border-radius: var(--radius-sm);
         font-size: 14px;
-        color: var(--color-text-main);
-        background-color: var(--color-surface);
+        color: var(--text-primary);
+        background-color: var(--bg-surface);
         outline: none;
-        transition: var(--transition);
+        transition: var(--transition-base);
     }
     
     .filter-group select:focus {
-        border-color: var(--color-primary);
+        border-color: var(--primary-500);
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
@@ -140,12 +117,12 @@
     }
 
     .kpi-card {
-        background: var(--color-surface);
+        background: var(--bg-surface);
         border-radius: var(--radius-md);
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--border-color);
         padding: 20px;
         box-shadow: var(--shadow-sm);
-        transition: var(--transition);
+        transition: var(--transition-base);
         display: flex;
         flex-direction: column;
     }
@@ -159,7 +136,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        color: var(--color-text-muted);
+        color: var(--text-secondary);
         font-size: 14px;
         font-weight: 500;
         margin-bottom: 12px;
@@ -173,13 +150,13 @@
         align-items: center;
         justify-content: center;
         background: #f1f5f9;
-        color: var(--color-primary);
+        color: var(--primary-500);
     }
 
     .kpi-value {
         font-size: 28px;
         font-weight: 700;
-        color: var(--color-text-main);
+        color: var(--text-primary);
         margin: 0;
         line-height: 1.2;
     }
@@ -193,9 +170,9 @@
     }
 
     .chart-card {
-        background: var(--color-surface);
+        background: var(--bg-surface);
         border-radius: var(--radius-md);
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--border-color);
         padding: 20px;
         box-shadow: var(--shadow-sm);
     }
@@ -210,7 +187,7 @@
     .chart-title {
         font-size: 16px;
         font-weight: 600;
-        color: var(--color-text-main);
+        color: var(--text-primary);
         margin: 0;
     }
 
@@ -222,16 +199,16 @@
 
     /* Detailed Data Table */
     .table-card {
-        background: var(--color-surface);
+        background: var(--bg-surface);
         border-radius: var(--radius-md);
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--border-color);
         box-shadow: var(--shadow-sm);
         overflow: hidden;
     }
     
     .table-toolbar {
         padding: 16px 20px;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -257,13 +234,13 @@
     .report-table th,
     .report-table td {
         padding: 14px 20px;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--border-color);
         font-size: 14px;
     }
 
     .report-table th {
         background: #f8fafc;
-        color: var(--color-text-muted);
+        color: var(--text-secondary);
         font-weight: 600;
         text-transform: uppercase;
         font-size: 12px;
@@ -271,7 +248,7 @@
     }
 
     .report-table tbody tr {
-        transition: var(--transition);
+        transition: var(--transition-base);
     }
 
     .report-table tbody tr:hover {
@@ -481,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 4. Render Bảng chi tiết & Chuẩn bị dữ liệu cho Export
     const tbody = document.querySelector('#reportTable tbody');
     if (deptLabels.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--color-text-muted);">
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-secondary);">
             <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:10px;"><path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg><br>
             Chưa có dữ liệu báo cáo
         </td></tr>`;
