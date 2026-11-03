@@ -100,11 +100,11 @@
                 <div class="nav-section-title">Tài chính & Hiệu suất</div>
                 <a href="{% url 'payroll:list' %}" class="nav-item {% if request.resolver_match.app_name == 'payroll' %}active{% endif %}">
                     <i data-lucide="banknote" class="nav-icon"></i>
-                    <span class="nav-text">Bảng Lương (Payroll)</span>
+                    <span class="nav-text">Bảng Lương</span>
                 </a>
                 <a href="{% url 'performance:list' %}" class="nav-item {% if request.resolver_match.app_name == 'performance' %}active{% endif %}">
                     <i data-lucide="star" class="nav-icon"></i>
-                    <span class="nav-text">Đánh Giá KPI Quý</span>
+                    <span class="nav-text">Đánh Giá Hiệu Suất</span>
                 </a>
                 <a href="{% url 'reports:list' %}" class="nav-item {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
                     <i data-lucide="pie-chart" class="nav-icon"></i>
