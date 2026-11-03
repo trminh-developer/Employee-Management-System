@@ -25,16 +25,54 @@ from apps.employees.models import Employee
 from apps.accounts.models import User
 from fastapi.responses import RedirectResponse
 
+OPENAPI_TAGS = [
+    {"name": "Xác thực", "description": "Đăng nhập JWT, làm mới Access Token và xem hồ sơ phiên đăng nhập hiện tại."},
+    {"name": "Nhân viên", "description": "Quản lý hồ sơ nhân sự cốt lõi (CRUD, tự động sinh mã nhân viên theo phòng ban)."},
+    {"name": "Phòng ban & Chức danh", "description": "Quản lý cơ cấu tổ chức đa cấp (Departments) và định biên chức danh chuyên môn (Positions)."},
+    {"name": "Chấm công", "description": "Điểm danh Check-in/Check-out thời gian thực, tự động tính đi muộn & giờ tăng ca (OT)."},
+    {"name": "Nghỉ phép", "description": "Đăng ký nghỉ phép và luồng phê duyệt 2 cấp (Manager cấp 1 -> HR/Admin cấp 2)."},
+    {"name": "Bảng lương", "description": "Tính lương tự động (OT 150%, BHXH/BHYT/BHTN 10.5%, Thuế TNCN lũy tiến 7 bậc) và bảo mật phiếu lương."},
+    {"name": "Đánh giá hiệu suất (KPI)", "description": "Quản lý kỳ đánh giá hiệu suất làm việc, chấm điểm KPI và phản hồi chuyên môn."},
+    {"name": "Thông báo", "description": "Trung tâm thông báo nội bộ thời gian thực và kích hoạt N8N Webhook bất đồng bộ."},
+    {"name": "Báo cáo & Thống kê", "description": "Báo cáo điều hành tổng hợp định biên nhân sự, tỷ trọng phòng ban, chấm công và quỹ lương."},
+]
+
 # Khởi tạo FastAPI App
 app = FastAPI(
-    title="Enterprise HR API", 
-    description="Hệ thống API Quản lý Nhân sự với RBAC (Role-Based Access Control)", 
-    version="2.0.0"
+    title="TMNexora Enterprise HR API",
+    description="Hệ thống RESTful API Quản lý Nhân sự toàn diện với JWT Authentication & RBAC 4 tầng (Admin, HR, Manager, Employee)",
+    version="2.1.0",
+    openapi_tags=OPENAPI_TAGS,
 )
 
 @app.get("/", include_in_schema=False)
 def root_redirect():
     return RedirectResponse(url="/docs")
+
+@app.get("/healthz", include_in_schema=False)
+@app.get("/healthz/", include_in_schema=False)
+def api_healthz():
+    """Docker & Kubernetes Liveness Probe."""
+    return {"status": "ok", "service": "tmnexora-fastapi"}
+
+@sync_to_async
+def _verify_database_connection() -> bool:
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT 1")
+        row = cursor.fetchone()
+        return bool(row and row[0] == 1)
+
+@app.get("/readyz", include_in_schema=False)
+@app.get("/readyz/", include_in_schema=False)
+async def api_readyz():
+    """Docker & Kubernetes Readiness Probe verifying MySQL connectivity."""
+    try:
+        if await _verify_database_connection():
+            return {"status": "ready", "database": "connected"}
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {exc}")
+    raise HTTPException(status_code=503, detail="Database readiness check failed")
 
 # Middleware tự động dọn dẹp kết nối Database cũ/chết của Django & gắn Correlation ID (X-Request-ID)
 @app.middleware("http")
@@ -58,7 +96,7 @@ app.add_middleware(
 )
 
 # --- JWT Config ---
-SECRET_KEY = "super_secret_jwt_key_for_fastapi_123"
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "super_secret_jwt_key_for_fastapi_123")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -579,7 +617,14 @@ async def delete_employee(emp_id: int, current_user: dict = Depends(RequireRole(
         raise HTTPException(status_code=404, detail="Không tìm thấy")
     return None
 
+# --- Đăng ký toàn bộ Router API nghiệp vụ mở rộng (Departments, Positions, Attendance, Leave, Payroll, Performance, Notifications, Reports) ---
+from apps.api_routers import register_enterprise_routers
+register_enterprise_routers(app, get_current_user, RequireRole)
+
 if __name__ == "__main__":
     import uvicorn
-    print("Đang khởi động Enterprise API Server tại http://127.0.0.1:8001")
-    uvicorn.run("fastapi_main:app", host="127.0.0.1", port=8001, reload=True)
+    api_host = os.environ.get("API_HOST", "127.0.0.1")
+    api_port = int(os.environ.get("API_PORT", os.environ.get("PORT", "8001")))
+    api_reload = os.environ.get("API_RELOAD", "true").lower() in ("1", "true", "yes")
+    print(f"Đang khởi động Enterprise API Server tại http://{api_host}:{api_port}")
+    uvicorn.run("fastapi_main:app", host=api_host, port=api_port, reload=api_reload)
