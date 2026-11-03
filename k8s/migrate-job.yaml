@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tmnexora-migrate
+  namespace: tmnexora
+  labels:
+    app.kubernetes.io/name: tmnexora
+    app.kubernetes.io/component: migration
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app: tmnexora
+        component: migration
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: tmnexora:1.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - manage.py
+            - migrate
+            - --noinput
+          envFrom:
+            - configMapRef:
+                name: tmnexora-config
+            - secretRef:
+                name: tmnexora-secret

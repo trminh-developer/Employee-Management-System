@@ -30,3 +30,17 @@ ENV/
 # Office temporary files
 ~$*
 
+
+# Collected Static Build Artifacts
+staticfiles/
+
+# Local Thesis Drafts & Temporary Report Scripts
+Data Analysis/*Final.docx
+Data Analysis/*-ver*.docx
+Data Analysis/*Bổ Sung*.docx
+scripts/thesis/
+scripts/build_full_thesis_report.py
+scripts/build_report_from_template.py
+scripts/inspect_template.py
+scripts/print_intro.py
+scripts/update_report_content.py
