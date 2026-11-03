@@ -6,6 +6,22 @@ from django.conf.urls.static import static
 from apps.employees.views import dashboard
 
 
+def healthz(request):
+    """Kubernetes liveness and startup probe endpoint."""
+    return HttpResponse("OK", content_type="text/plain; charset=utf-8", status=200)
+
+
+def readyz(request):
+    """Kubernetes readiness probe endpoint verifying database connectivity."""
+    from django.db import connection
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return HttpResponse("READY", content_type="text/plain; charset=utf-8", status=200)
+    except Exception as e:
+        return HttpResponse(f"UNAVAILABLE: {str(e)}", content_type="text/plain; charset=utf-8", status=503)
+
+
 def robots_txt(request):
     sitemap_url = request.build_absolute_uri('/sitemap.xml')
     lines = [
@@ -43,6 +59,11 @@ def sitemap_xml(request):
 
 
 urlpatterns = [
+    # Cloud-Native Health Probes
+    path('healthz/', healthz, name='healthz'),
+    path('readyz/', readyz, name='readyz'),
+
+    # SEO & Standard Routes
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_xml, name='sitemap_xml'),
     path('admin/', admin.site.urls),
@@ -60,4 +81,3 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

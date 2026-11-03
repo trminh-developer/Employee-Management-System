@@ -1,0 +1,64 @@
+# ==============================================================================
+# TMNexora — .dockerignore
+# ==============================================================================
+
+# Git & Version Control
+.git/
+.gitignore
+.gitattributes
+
+# Environment Secrets & Local Configs
+.env
+.env.local
+.env.*
+!.env.example
+*.local_settings.py
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# Local Databases & Backups
+*.sqlite3
+*.db
+*.bak
+*.sql
+*.dump
+
+# Media Uploads & Generated Static Files
+media/
+staticfiles/
+
+# IDE & Editor Directories
+.vscode/
+.vs/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Documentation & Analysis (Keep image slim)
+Data Analysis/
+*.docx
+*.pptx
+*.xlsx
+*.csv
+
+# Kubernetes Manifests
+k8s/
+
+# OS specific files
+Thumbs.db
+Desktop.ini
+.DS_Store

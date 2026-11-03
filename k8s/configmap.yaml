@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tmnexora-config
+  namespace: tmnexora
+  labels:
+    app.kubernetes.io/name: tmnexora
+    app.kubernetes.io/component: config
+data:
+  DJANGO_DEBUG: "False"
+  DJANGO_ALLOWED_HOSTS: "*"
+  DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost:8000,http://127.0.0.1:8000,http://tmnexora.local"
+  DJANGO_LOG_LEVEL: "INFO"
+  DB_ENGINE: "django.db.backends.mysql"
+  DB_NAME: "ems"
+  DB_HOST: "mysql-service"
+  DB_PORT: "3306"
+  PORT: "8000"
+  GUNICORN_WORKERS: "3"
+  GUNICORN_TIMEOUT: "60"

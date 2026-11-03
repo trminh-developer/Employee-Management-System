@@ -1,0 +1,106 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: tmnexora-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-ems}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${DB_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tmnexora-web:latest
+    container_name: tmnexora-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-docker-production-secret-key-tmnexora-2026}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0,web,api}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:8000,http://127.0.0.1:8000,http://localhost:8080,http://127.0.0.1:8080}
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: ${DB_NAME:-ems}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_WAIT: "1"
+      AUTO_MIGRATE: "1"
+      PORT: "8000"
+      GUNICORN_WORKERS: "3"
+      GUNICORN_TIMEOUT: "60"
+      API_URL: "http://api:8001/api/"
+    ports:
+      - "8000:8000"
+      - "8080:8000"
+    volumes:
+      - media_data:/app/media
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/readyz/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tmnexora-web:latest
+    container_name: tmnexora-api
+    command: ["fastapi"]
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-docker-production-secret-key-tmnexora-2026}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-docker-production-jwt-secret-tmnexora-2026}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0,api,web}
+      DJANGO_LOG_LEVEL: ${DJANGO_LOG_LEVEL:-info}
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: ${DB_NAME:-ems}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_WAIT: "1"
+      AUTO_MIGRATE: "0"
+      PORT: "8001"
+      UVICORN_WORKERS: "${UVICORN_WORKERS:-2}"
+      N8N_WEBHOOK_URL: "${N8N_WEBHOOK_URL:-http://host.docker.internal:5678/webhook/send-notification}"
+    ports:
+      - "${API_HOST_PORT:-8001}:8001"
+    volumes:
+      - media_data:/app/media
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8001/readyz/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  mysql_data:
+  media_data:
