@@ -4,11 +4,12 @@
 {% block og_title %}Quản Lý Chấm Công - TMNexora{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Quản Lý Chấm Công (Attendance Management)</h1>
-        <p class="page-subtitle">Nhật ký check-in, check-out và phân tích tỷ lệ đi làm theo ngày</p>
-    </div>
+<div class="employee-workspace">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Quản Lý Chấm Công</h1>
+            <p class="page-subtitle">Nhật ký check-in, check-out và phân tích tỷ lệ đi làm theo ngày</p>
+        </div>
     <div>
         {% if request.user.role == 'admin' or request.user.role == 'hr' %}
         <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/attendance/attendance/add/?_popup=1', 'Chấm Công Thủ Công'); return false;">
@@ -77,5 +78,6 @@
             </tbody>
         </table>
     </div>
+</div>
 </div>
 {% endblock %}

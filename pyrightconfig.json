@@ -1,4 +1,5 @@
 {
+    "pythonPath": "C:\\Program Files\\Python314\\python.exe",
     "include": [
         "apps",
         "config",
@@ -11,5 +12,6 @@
     ],
     "reportAttributeAccessIssue": "none",
     "reportOptionalMemberAccess": "none",
-    "reportGeneralTypeIssues": "none"
+    "reportGeneralTypeIssues": "none",
+    "reportMissingImports": "none"
 }

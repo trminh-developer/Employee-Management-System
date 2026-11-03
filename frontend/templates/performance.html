@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Đánh giá hiệu suất (KPI) - Hệ Thống Quản Lý Nhân Sự{% endblock %}
-{% block meta_description %}Theo dõi và quản lý kết quả đánh giá hiệu suất làm việc (KPI) định kỳ của nhân viên trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
-{% block og_title %}Đánh giá hiệu suất (KPI) - Hệ Thống Quản Lý Nhân Sự{% endblock %}
+{% block title %}Đánh giá hiệu suất - Hệ Thống Quản Lý Nhân Sự TMNexora{% endblock %}
+{% block meta_description %}Theo dõi và quản lý kết quả đánh giá hiệu suất làm việc định kỳ của nhân viên trong Hệ Thống Quản Lý Nhân Sự.{% endblock %}
+{% block og_title %}Đánh giá hiệu suất - TMNexora{% endblock %}
 
 {% block content %}
 <style>
@@ -171,9 +171,11 @@
 </style>
 
 <div class="employee-workspace">
-    <div class="page-header" style="margin-bottom: 20px;">
-        <h1>Đánh giá hiệu suất (KPI)</h1>
-        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Theo dõi kết quả đánh giá năng lực và KPI định kỳ của nhân sự.</p>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Đánh giá hiệu suất</h1>
+            <p class="page-subtitle">Theo dõi kết quả đánh giá năng lực và hiệu suất định kỳ của nhân sự</p>
+        </div>
     </div>
     {% if selected_employee %}
     <div style="margin-bottom: 15px; padding: 10px 15px; background: var(--bg-surface); border: 1px solid var(--primary-500); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">

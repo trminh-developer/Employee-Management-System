@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
-{% block title %}Bảng Lương Doanh Nghiệp (Payroll) - Hệ Thống Quản Lý Nhân Sự TMNexora{% endblock %}
+{% block title %}Bảng Lương Doanh Nghiệp - Hệ Thống Quản Lý Nhân Sự TMNexora{% endblock %}
 {% block meta_description %}Tổng hợp và quản lý bảng lương nhân viên theo kỳ, bao gồm lương cơ sở, phụ cấp, khấu trừ thuế và lương thực nhận.{% endblock %}
-{% block og_title %}Bảng Lương Doanh Nghiệp (Payroll) - TMNexora{% endblock %}
+{% block og_title %}Bảng Lương Doanh Nghiệp - TMNexora{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Bảng Lương Doanh Nghiệp (Payroll Management)</h1>
-        <p class="page-subtitle">Tính toán lương Gross, BHXH bắt buộc, Thuế TNCN và tiền thực nhận Net</p>
-    </div>
+<div class="employee-workspace">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Bảng Lương Doanh Nghiệp</h1>
+            <p class="page-subtitle">Tính toán lương Gross, BHXH bắt buộc, Thuế TNCN và tiền thực nhận Net</p>
+        </div>
     <div>
         {% if request.user.role == 'admin' or request.user.role == 'hr' %}
         <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/payroll/payroll/add/?_popup=1', 'Tính Lương Kỳ Mới'); return false;">
@@ -80,5 +81,6 @@
             </tbody>
         </table>
     </div>
+</div>
 </div>
 {% endblock %}
