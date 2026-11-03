@@ -1,73 +1,427 @@
 {% extends 'base.html' %}
 {% block title %}Cơ Cấu Phòng Ban - Hệ Thống Quản Lý Nhân Sự TMNexora{% endblock %}
-{% block meta_description %}Quản lý cơ cấu tổ chức, danh sách phòng ban, người quản lý trực tiếp và ngân sách vận hành của doanh nghiệp.{% endblock %}
+{% block meta_description %}Quản lý cơ cấu tổ chức, danh sách phòng ban, người quản lý trực tiếp và định biên nhân sự của doanh nghiệp.{% endblock %}
 {% block og_title %}Cơ Cấu Phòng Ban - TMNexora{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Cơ Cấu Phòng Ban (Departments)</h1>
-        <p class="page-subtitle">Quản lý sơ đồ cơ cấu tổ chức và định biên phòng ban chuyên môn</p>
+<div class="employee-workspace">
+    <!-- Page Header matching Employees Structure -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Cơ Cấu Phòng Ban</h1>
+            <p class="page-subtitle">Quản lý sơ đồ cơ cấu tổ chức và định biên phòng ban chuyên môn</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+            <button type="button" class="btn btn-primary"
+                onclick="openCrudModal('/admin/departments/department/add/?_popup=1', 'Thêm Phòng Ban Mới'); return false;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-right: 4px;">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Thêm Phòng Ban
+            </button>
+            {% endif %}
+        </div>
     </div>
-    <div>
-        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
-        <button type="button" id="addNew" class="btn btn-primary" onclick="openCrudModal('/admin/departments/department/add/?_popup=1', 'Thêm Phòng Ban Mới'); return false;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Thêm Phòng Ban
-        </button>
-        {% endif %}
+
+    <!-- Content Card with Compact Search & Filter Toolbar -->
+    <div class="content-card">
+        <div class="card-header" style="padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <form method="GET" class="card-toolbar" id="deptSearchForm" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0;">
+                <div class="input-icon-wrapper" style="position: relative; width: 260px;">
+                    <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;"></i>
+                    <input type="text" id="deptSearchInput" name="q" value="{{ search_query }}" 
+                           placeholder="Tìm phòng ban, người quản lý..." 
+                           class="form-input" style="padding-left: 32px !important; padding-right: 24px !important; width: 100% !important; height: 32px; font-size: 0.82rem;" autocomplete="off">
+                    <button type="button" id="deptSearchClear" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px 4px; display: {% if search_query %}block{% else %}none{% endif %}; font-size: 12px;" title="Xóa tìm kiếm">✕</button>
+                </div>
+
+                <button type="submit" class="btn btn-secondary btn-sm" style="height: 32px; font-size: 0.82rem; padding: 0 12px; white-space: nowrap;">Lọc</button>
+            </form>
+
+            <span style="font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; margin-left: auto;">
+                Hiển thị: <strong id="deptCountBadge" style="color: var(--text-primary);">{{ departments|length }}</strong> phòng ban
+            </span>
+        </div>
+
+        <!-- Modern Data Table -->
+        <div class="table-responsive">
+            <table class="data-table" id="departmentTable">
+                <thead>
+                    <tr>
+                        <th>TÊN PHÒNG BAN</th>
+                        <th>NGƯỜI QUẢN LÝ</th>
+                        <th>PHÒNG BAN CẤP TRÊN</th>
+                        <th>ĐỊNH BIÊN NHÂN SỰ</th>
+                        <th>NGÂN SÁCH VẬN HÀNH</th>
+                        <th>HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in departments %}
+                    <tr class="department-row" style="cursor: pointer;" onclick="handleRowClick(event, this)"
+                        data-id="{{ dept.id }}"
+                        data-name="{{ dept.name }}"
+                        data-manager="{{ dept.manager.get_full_name|default:dept.manager.username|default:'Chưa phân công' }}"
+                        data-manager-avatar="{% if dept.manager.employee_profile.avatar %}{{ dept.manager.employee_profile.avatar.url }}{% endif %}"
+                        data-manager-initials="{{ dept.manager.first_name|slice:':1'|upper }}{{ dept.manager.last_name|slice:':1'|upper|default:dept.manager.username|slice:':2'|upper|default:'QL' }}"
+                        data-manager-role="{{ dept.manager.employee_profile.position.title|default:'Trưởng ban / Giám đốc bộ phận' }}"
+                        data-manager-email="{{ dept.manager.email|default:'Chưa cập nhật' }}"
+                        data-manager-phone="{{ dept.manager.employee_profile.phone|default:'Chưa cập nhật' }}"
+                        data-parent="{{ dept.parent.name|default:'Không có (Phòng ban gốc)' }}"
+                        data-employees="{{ dept.employee_count|default:0 }}"
+                        data-budget="{% if dept.budget %}{{ dept.budget|floatformat:0 }} đ{% else %}0 đ{% endif %}"
+                        data-desc="{{ dept.description|default:'Chưa có mô tả chức năng nhiệm vụ cho phòng ban này.' }}"
+                        data-emp-url="{% url 'employees:list' %}?department={{ dept.id }}"
+                        data-edit-url="/admin/departments/department/{{ dept.id }}/change/?_popup=1"
+                        data-delete-url="/admin/departments/department/{{ dept.id }}/delete/?_popup=1"
+                        data-search="{{ dept.name }} {{ dept.manager.get_full_name|default:'' }} {{ dept.manager.username }} {{ dept.parent.name|default:'' }} {{ dept.description|default:'' }}">
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--primary-50); color: var(--primary-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="network" style="width: 16px; height: 16px;"></i>
+                                </div>
+                                <strong style="color: var(--text-primary); font-size: 0.9rem;">{{ dept.name }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="avatar" style="width: 32px; height: 32px; font-size: 0.78rem; font-weight: 700; background: var(--primary-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                                    {% if dept.manager.employee_profile.avatar %}
+                                    <img src="{{ dept.manager.employee_profile.avatar.url }}" width="32" height="32" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar {{ dept.manager.username }}">
+                                    {% else %}
+                                    {{ dept.manager.first_name|slice:':1'|upper }}{{ dept.manager.last_name|slice:':1'|upper|default:dept.manager.username|slice:':2'|upper|default:"QL" }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <strong style="color: var(--text-primary); display: block;">{{ dept.manager.get_full_name|default:dept.manager.username|default:"Chưa phân công" }}</strong>
+                                    <small style="color: var(--text-muted); font-size: 0.75rem;">{{ dept.manager.email|default:"-" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if dept.parent %}
+                            <span class="badge badge-neutral">{{ dept.parent.name }}</span>
+                            {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.82rem;">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'employees:list' %}?department={{ dept.id }}" class="badge badge-primary" style="text-decoration: none; font-weight: 600; cursor: pointer;" title="Bấm để xem danh sách nhân sự phòng ban này">
+                                <i data-lucide="users" style="width: 13px; height: 13px;"></i>
+                                {{ dept.employee_count }} nhân sự
+                            </a>
+                        </td>
+                        <td style="font-weight: 600; font-family: var(--font-mono); color: var(--text-primary);">
+                            {% if dept.budget %}
+                            {{ dept.budget|floatformat:0 }} đ
+                            {% else %}
+                            0 đ
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openDeptDrawer(this.closest('tr'))">
+                                    Chi tiết
+                                </button>
+                                <a href="{% url 'employees:list' %}?department={{ dept.id }}" class="btn-action" style="color: var(--status-success); margin-left: 2px;" title="Xem nhân sự">Nhân sự</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="emptyDbRow">
+                        <td colspan="6" style="text-align:center; padding: 36px 20px; color: var(--text-secondary);">
+                            Chưa có phòng ban nào trong hệ thống.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Dynamic Empty State for live instant search filter -->
+                    <tr id="liveNoResultRow" style="display: none;">
+                        <td colspan="6" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="search-x" style="width: 24px; height: 24px; color: var(--text-muted);"></i>
+                            </div>
+                            <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text-primary);">
+                                Không tìm thấy phòng ban phù hợp với từ khóa "<span id="missingKeywordText"></span>"
+                            </div>
+                            <small style="color: var(--text-muted); font-size: 13px;">Hãy thử tìm theo tên phòng ban hoặc tên người quản lý.</small>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div class="content-card">
-    <div class="card-header">
-        <h2 class="card-title">Danh Sách Các Phòng Ban Trực Thuộc</h2>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">
-            Tổng cộng: <strong style="color: var(--text-primary);">{{ departments|length }}</strong> phòng ban
-        </span>
-    </div>
-    <div class="table-responsive">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>TÊN PHÒNG BAN</th>
-                    <th>NGƯỜI QUẢN LÝ</th>
-                    <th>PHÒNG BAN CẤP TRÊN</th>
-                    <th>NGÂN SÁCH</th>
-                    <th>HÀNH ĐỘNG</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for dept in departments %}
-                <tr>
-                    <td>
-                        <strong style="color: var(--text-primary); font-size: 0.9rem;">{{ dept.name }}</strong>
-                    </td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div class="avatar" style="width: 28px; height: 28px; font-size: 0.72rem; background: var(--primary-100); color: var(--primary-700); font-weight: 700;">
-                                {{ dept.manager.first_name|slice:':1'|upper }}{{ dept.manager.last_name|slice:':1'|upper|default:"QL" }}
-                            </div>
-                            <span>{{ dept.manager.get_full_name|default:"Chưa phân công" }}</span>
-                        </div>
-                    </td>
-                    <td>{{ dept.parent.name|default:"-" }}</td>
-                    <td style="font-weight: 600; font-family: var(--font-mono); color: var(--text-primary);">${{ dept.budget }}</td>
-                    <td>
-                        <a href="{% url 'employees:list' %}?department={{ dept.id }}" class="btn-action" style="color: var(--status-success);">Xem Nhân Sự</a>
-                        {% if request.user.role == 'admin' or request.user.role == 'hr' %}
-                        <a href="#" onclick="openCrudModal('/admin/departments/department/{{ dept.id }}/change/?_popup=1', 'Sửa Phòng Ban'); return false;" class="btn-action">Sửa</a>
-                        <a href="#" onclick="openCrudModal('/admin/departments/department/{{ dept.id }}/delete/?_popup=1', 'Xóa Phòng Ban'); return false;" class="btn-action" style="color: var(--status-danger);">Xóa</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" style="text-align:center; padding: 36px 20px; color: var(--text-secondary);">Chưa có phòng ban nào trong hệ thống.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- ==========================================================================
+     Department Details Slide-over Drawer (Matching Employees Drawer Pixel-for-Pixel)
+     ========================================================================== -->
+<div id="deptDrawerOverlay" class="drawer-overlay" onclick="closeDeptDrawer(event)">
+    <div id="deptDrawerContent" class="drawer-content" onclick="event.stopPropagation()">
+        <!-- Drawer Header -->
+        <div class="modal-header"
+            style="padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="modal-title"
+                style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-primary);">Chi Tiết Cơ Cấu Phòng Ban</h2>
+            <button type="button" class="modal-close" onclick="closeDeptDrawer()"
+                style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-muted);"
+                title="Đóng (ESC)">✕</button>
+        </div>
+
+        <!-- Drawer Body -->
+        <div class="modal-body" style="padding: 24px; flex: 1; overflow-y: auto;">
+            <!-- Profile Banner -->
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                <div id="drawerDeptIcon"
+                    style="width: 54px; height: 54px; border-radius: var(--radius-lg); background: var(--primary-100); color: var(--brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow-sm);">
+                    <i data-lucide="network" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                    <div id="drawerDeptName"
+                        style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); line-height: 1.2;">-</div>
+                    <div id="drawerParentDept"
+                        style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">-</div>
+                </div>
+                <span id="drawerEmpCountBadge" class="badge badge-primary"
+                    style="margin-left: auto; padding: 4px 10px; font-size: 0.78rem;">0 nhân sự</span>
+            </div>
+
+            <!-- 4 Stat Boxes (2x2 Grid) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;">
+                <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        NGƯỜI QUẢN LÝ</div>
+                    <div id="drawerManagerName"
+                        style="font-weight: 600; color: var(--text-primary); margin-top: 4px; font-size: 0.92rem;">-</div>
+                </div>
+                <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        PHÒNG BAN CẤP TRÊN</div>
+                    <div id="drawerParent"
+                        style="font-weight: 600; color: var(--text-primary); margin-top: 4px; font-size: 0.92rem;">-</div>
+                </div>
+                <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        ĐỊNH BIÊN NHÂN SỰ</div>
+                    <div id="drawerEmployees"
+                        style="font-weight: 700; color: var(--brand-primary); margin-top: 4px; font-size: 0.95rem;">-</div>
+                </div>
+                <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.03em;">
+                        NGÂN SÁCH VẬN HÀNH</div>
+                    <div id="drawerBudget"
+                        style="font-weight: 700; color: var(--status-success); margin-top: 4px; font-size: 0.95rem;">-</div>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 18px;">
+                <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 14px; color: var(--text-primary);">Chức Năng & Nhiệm Vụ</h4>
+                <div id="drawerDescription" style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; margin-bottom: 18px; background: var(--bg-body); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); white-space: pre-line;">-</div>
+
+                <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 14px; color: var(--text-primary);">Thông Tin Người Quản Lý Trực Tiếp</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Họ và tên:</span>
+                        <strong id="drawerManagerFull" style="color: var(--text-primary);">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Chức vụ:</span>
+                        <span id="drawerManagerRole" style="color: var(--text-primary); font-weight: 500;">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Email:</span>
+                        <span id="drawerManagerEmail" style="color: var(--text-primary);">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Số điện thoại:</span>
+                        <span id="drawerManagerPhone" style="color: var(--text-primary);">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer Footer Actions -->
+        <div class="modal-footer"
+            style="padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-body);">
+            <a id="drawerViewEmployeesBtn" href="#" class="btn btn-primary" style="font-size: 0.85rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Xem Danh Sách Nhân Sự
+            </a>
+            {% if request.user.role == 'admin' or request.user.role == 'hr' %}
+            <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openDeptDrawerEdit()">Sửa</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="openDeptDrawerDelete()">Xóa</button>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<script>
+    let currentDeptEditUrl = '';
+    let currentDeptDeleteUrl = '';
+    let currentDeptEmpUrl = '';
+
+    function handleRowClick(event, row) {
+        if (event.target.closest('a') || event.target.closest('button')) {
+            return;
+        }
+        openDeptDrawer(row);
+    }
+
+    function openDeptDrawer(row) {
+        if (!row) return;
+        const d = row.dataset;
+        currentDeptEditUrl = d.editUrl || '';
+        currentDeptDeleteUrl = d.deleteUrl || '';
+        currentDeptEmpUrl = d.empUrl || '';
+
+        document.getElementById('drawerDeptName').textContent = d.name || '-';
+        document.getElementById('drawerParentDept').textContent = d.parent || '-';
+        document.getElementById('drawerEmpCountBadge').textContent = (d.employees || 0) + ' nhân sự';
+
+        document.getElementById('drawerManagerName').textContent = d.manager || '-';
+        document.getElementById('drawerParent').textContent = d.parent || '-';
+        document.getElementById('drawerEmployees').textContent = (d.employees || 0) + ' nhân sự';
+        document.getElementById('drawerBudget').textContent = d.budget || '0 đ';
+
+        document.getElementById('drawerDescription').textContent = d.desc || 'Chưa có mô tả chức năng nhiệm vụ cho phòng ban này.';
+        document.getElementById('drawerManagerFull').textContent = d.manager || '-';
+        document.getElementById('drawerManagerRole').textContent = d.managerRole || 'Trưởng ban / Giám đốc bộ phận';
+        document.getElementById('drawerManagerEmail').textContent = d.managerEmail || '-';
+        document.getElementById('drawerManagerPhone').textContent = d.managerPhone || '-';
+
+        const empBtn = document.getElementById('drawerViewEmployeesBtn');
+        if (empBtn) {
+            empBtn.href = currentDeptEmpUrl || '#';
+        }
+
+        const overlay = document.getElementById('deptDrawerOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeptDrawer(e) {
+        if (e && e.target !== document.getElementById('deptDrawerOverlay') && !e.target.classList.contains('modal-close') && e.target.tagName !== 'BUTTON') {
+            return;
+        }
+        const overlay = document.getElementById('deptDrawerOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+        document.body.style.overflow = '';
+    }
+
+    function openDeptDrawerEdit() {
+        if (currentDeptEditUrl) {
+            closeDeptDrawer();
+            openCrudModal(currentDeptEditUrl, 'Chỉnh Sửa Cơ Cấu Phòng Ban');
+        }
+    }
+
+    function openDeptDrawerDelete() {
+        if (currentDeptDeleteUrl) {
+            closeDeptDrawer();
+            openCrudModal(currentDeptDeleteUrl, 'Xoá Phòng Ban');
+        }
+    }
+
+    // Keyboard ESC closes drawer
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeDeptDrawer();
+        }
+    });
+
+    // 0-Latency Live Instant Search & Filter (Matching Employees Logic)
+    (function () {
+        const searchInput = document.getElementById('deptSearchInput');
+        const clearBtn = document.getElementById('deptSearchClear');
+        const countBadge = document.getElementById('deptCountBadge');
+        const rows = Array.from(document.querySelectorAll('.department-row'));
+        const noResultRow = document.getElementById('liveNoResultRow');
+        const missingKeywordSpan = document.getElementById('missingKeywordText');
+
+        function removeVietnameseTones(str) {
+            if (!str) return '';
+            str = str.toLowerCase();
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+            str = str.replace(/đ/g, "d");
+            str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+            str = str.replace(/\u02C6|\u0306|\u031B/g, "");
+            return str.trim();
+        }
+
+        const rowData = rows.map(r => ({
+            element: r,
+            rawText: (r.dataset.search || '').toLowerCase(),
+            normalizedText: removeVietnameseTones(r.dataset.search || '')
+        }));
+
+        function performFilter() {
+            const rawQuery = (searchInput ? searchInput.value : '').trim();
+            const normalizedQuery = removeVietnameseTones(rawQuery);
+
+            if (clearBtn) {
+                clearBtn.style.display = rawQuery ? 'block' : 'none';
+            }
+
+            let matchCount = 0;
+            const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+
+            rowData.forEach(item => {
+                const matchesSearch = queryTokens.length === 0 || queryTokens.every(tok =>
+                    item.rawText.includes(tok) || item.normalizedText.includes(tok)
+                );
+
+                if (matchesSearch) {
+                    item.element.style.display = '';
+                    matchCount++;
+                } else {
+                    item.element.style.display = 'none';
+                }
+            });
+
+            if (countBadge) {
+                countBadge.textContent = `${matchCount}`;
+            }
+
+            if (noResultRow) {
+                if (matchCount === 0) {
+                    noResultRow.style.display = '';
+                    if (missingKeywordSpan) missingKeywordSpan.textContent = rawQuery || 'Từ khóa';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                } else {
+                    noResultRow.style.display = 'none';
+                }
+            }
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', performFilter);
+        }
+
+        if (clearBtn && searchInput) {
+            clearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                performFilter();
+                searchInput.focus();
+            });
+        }
+    })();
+</script>
 {% endblock %}
